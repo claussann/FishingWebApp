@@ -72,9 +72,6 @@ Tutte le variabili di stile si trovano in cima a `style.css` nella sezione `:roo
 ### 📱 Versione Mobile
 È in sviluppo una versione **React Native** con Expo che include funzionalità aggiuntive come foto attrezzatura dalla fotocamera, notifiche e promemoria, e GPS nativo.
 
-### 📄 Licenza
-Questo progetto è rilasciato sotto licenza [MIT](LICENSE).
-
 ---
 
 ## 🇬🇧 English
@@ -141,9 +138,6 @@ All style variables are at the top of `style.css` in the `:root` section. You ca
 
 ### 📱 Mobile Version
 A **React Native** version with Expo is in development, featuring additional capabilities such as gear photos from the camera, push notifications and reminders, and native GPS.
-
-### 📄 License
-This project is released under the [MIT](LICENSE) license.
 
 ---
 

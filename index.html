@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fishing Inventory</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body>
 
   <!-- ===================== SPLASH SCREEN ===================== -->
@@ -19,16 +23,19 @@
     <div class="splash-content">
       <div class="splash-logo-wrap">
         <svg class="splash-svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="65" cy="65" r="60" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-          <ellipse cx="62" cy="68" rx="28" ry="16" fill="white" opacity="0.95"/>
-          <polygon points="90,68 106,55 106,81" fill="white" opacity="0.75"/>
-          <circle cx="47" cy="64" r="5" fill="#1a3a5c"/>
-          <circle cx="45.5" cy="62.5" r="2" fill="white"/>
-          <path d="M62 52 Q70 42 78 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
-          <line x1="28" y1="20" x2="90" y2="57" stroke="#FFD166" stroke-width="3" stroke-linecap="round"/>
-          <line x1="90" y1="57" x2="90" y2="78" stroke="#FFD166" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
-          <ellipse cx="90" cy="82" rx="6" ry="4" fill="#FF6B6B"/>
-          <ellipse cx="90" cy="79" rx="6" ry="3.5" fill="#FF4444"/>
+          <circle cx="65" cy="65" r="60" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)"
+            stroke-width="2" />
+          <ellipse cx="62" cy="68" rx="28" ry="16" fill="white" opacity="0.95" />
+          <polygon points="90,68 106,55 106,81" fill="white" opacity="0.75" />
+          <circle cx="47" cy="64" r="5" fill="#1a3a5c" />
+          <circle cx="45.5" cy="62.5" r="2" fill="white" />
+          <path d="M62 52 Q70 42 78 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"
+            opacity="0.6" />
+          <line x1="28" y1="20" x2="90" y2="57" stroke="#FFD166" stroke-width="3" stroke-linecap="round" />
+          <line x1="90" y1="57" x2="90" y2="78" stroke="#FFD166" stroke-width="2" stroke-dasharray="4,3"
+            opacity="0.8" />
+          <ellipse cx="90" cy="82" rx="6" ry="4" fill="#FF6B6B" />
+          <ellipse cx="90" cy="79" rx="6" ry="3.5" fill="#FF4444" />
         </svg>
       </div>
       <h1 class="splash-title">Fishing<br>Inventory</h1>
@@ -48,12 +55,12 @@
     <header id="main-header">
       <div class="header-brand">
         <svg class="header-logo-svg" viewBox="0 0 48 48" fill="none">
-          <ellipse cx="22" cy="25" rx="13" ry="8" fill="#fff"/>
-          <polygon points="35,25 44,18 44,32" fill="rgba(255,255,255,0.7)"/>
-          <circle cx="16" cy="23" r="2.5" fill="#1a3a5c"/>
-          <line x1="10" y1="9" x2="35" y2="23" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
-          <line x1="35" y1="23" x2="35" y2="33" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="3,2"/>
-          <circle cx="35" cy="36" r="3" fill="#FF6B6B"/>
+          <ellipse cx="22" cy="25" rx="13" ry="8" fill="#fff" />
+          <polygon points="35,25 44,18 44,32" fill="rgba(255,255,255,0.7)" />
+          <circle cx="16" cy="23" r="2.5" fill="#1a3a5c" />
+          <line x1="10" y1="9" x2="35" y2="23" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="35" y1="23" x2="35" y2="33" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="3,2" />
+          <circle cx="35" cy="36" r="3" fill="#FF6B6B" />
         </svg>
         <span class="header-brand-name">Fishing Inventory</span>
       </div>
@@ -72,14 +79,16 @@
 
     <!-- MOBILE NAV -->
     <div class="mobile-nav hidden" id="mobile-nav">
-      <button class="mob-btn" data-section="home">🏠 Home</button>
-      <button class="mob-btn" data-section="attrezzatura">🎣 Attrezzatura</button>
-      <button class="mob-btn" data-section="spot">📍 Spot</button>
-      <button class="mob-btn" data-section="diario">📔 Diario</button>
-      <button class="mob-btn" data-section="statistiche">📊 Statistiche</button>
-      <button class="mob-btn mob-backup" id="btn-backup-mob">💾 Esporta Backup</button>
-      <button class="mob-btn mob-import" id="btn-import-mob">📂 Importa Backup</button>
-      <button class="mob-btn mob-theme" id="btn-theme-mob">🌙 Cambia Tema</button>
+      <div class="info-container">
+        <button class="mob-btn" data-section="home">🏠 Home</button>
+        <button class="mob-btn" data-section="attrezzatura">🎣 Attrezzatura</button>
+        <button class="mob-btn" data-section="spot">📍 Spot</button>
+        <button class="mob-btn" data-section="diario">📔 Diario</button>
+        <button class="mob-btn" data-section="statistiche">📊 Statistiche</button>
+        <button class="mob-btn mob-backup" id="btn-backup-mob">💾 Esporta Backup</button>
+        <button class="mob-btn mob-import" id="btn-import-mob">📂 Importa Backup</button>
+        <button class="mob-btn mob-theme" id="btn-theme-mob">🌙 Cambia Tema</button>
+      </div>
     </div>
 
     <!-- ============ HOME ============ -->
@@ -90,9 +99,14 @@
           <p class="hero-sub">Gestisci attrezzatura, spot, uscite e statistiche tutto in un posto.</p>
         </div>
         <div class="hero-fish-deco">🐟</div>
+        <div class="info-container">
+          <button class="info-btn">?</button>
+          <span class="tooltip">Realizzata da Claudio Sanna</span>
+        </div>
       </div>
-
       <div class="home-grid">
+
+
         <!-- METEO -->
         <div class="card card-meteo">
           <div class="card-head">
@@ -124,7 +138,9 @@
         <div class="card card-stats">
           <div class="card-head">
             <span class="card-emoji">📊</span>
-            <div><h3>Il tuo Inventario</h3></div>
+            <div>
+              <h3>Il tuo Inventario</h3>
+            </div>
           </div>
           <div class="quick-stats-grid">
             <div class="qstat" onclick="showSection('attrezzatura')">
@@ -149,7 +165,9 @@
         <div class="card card-ultima">
           <div class="card-head">
             <span class="card-emoji">🕐</span>
-            <div><h3>Ultima Uscita</h3></div>
+            <div>
+              <h3>Ultima Uscita</h3>
+            </div>
           </div>
           <div id="ultima-uscita-content">
             <p class="empty-inline">Nessuna uscita registrata ancora.</p>
@@ -277,7 +295,9 @@
           <div class="card stat-card-big">
             <div class="card-head">
               <span class="card-emoji">🏆</span>
-              <div><h3>Spot Più Visitati</h3></div>
+              <div>
+                <h3>Spot Più Visitati</h3>
+              </div>
             </div>
             <div id="top-spot-list" class="top-list">
               <p class="empty-inline">Nessun dato disponibile.</p>
@@ -288,7 +308,9 @@
           <div class="card stat-card-big">
             <div class="card-head">
               <span class="card-emoji">⭐</span>
-              <div><h3>Attrezzatura Più Usata</h3></div>
+              <div>
+                <h3>Attrezzatura Più Usata</h3>
+              </div>
             </div>
             <div id="top-att-list" class="top-list">
               <p class="empty-inline">Nessun dato disponibile.</p>
@@ -426,7 +448,8 @@
         </div>
         <div class="form-group">
           <label>Note / Commenti</label>
-          <textarea id="uscita-note" placeholder="Come è andata? Catture, condizioni meteo, osservazioni..." rows="3"></textarea>
+          <textarea id="uscita-note" placeholder="Come è andata? Catture, condizioni meteo, osservazioni..."
+            rows="3"></textarea>
         </div>
         <div class="form-error hidden" id="form-uscita-error">Inserisci almeno la data.</div>
         <button type="submit" class="btn-primary btn-full">💾 Salva Uscita</button>
@@ -448,7 +471,8 @@
         <div class="import-info">
           <div class="import-preview" id="import-preview"></div>
           <div class="import-warning">
-            ⚠️ <strong>Attenzione:</strong> l'importazione sovrascriverà tutti i dati attuali (attrezzatura, spot e diario). Questa operazione non è reversibile.
+            ⚠️ <strong>Attenzione:</strong> l'importazione sovrascriverà tutti i dati attuali (attrezzatura, spot e
+            diario). Questa operazione non è reversibile.
           </div>
         </div>
         <div class="form-error hidden" id="import-error">File non valido o corrotto.</div>
@@ -463,4 +487,5 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>
