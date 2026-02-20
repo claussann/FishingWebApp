@@ -165,6 +165,18 @@ textarea {
   }
 }
 
+
+  .author {
+  margin-top: 5px;
+  font-family: var(--font-display);
+  background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 0.6rem;
+  text-align: right;
+}
+
 .splash-content {
   position: relative;
   z-index: 10;
@@ -388,29 +400,9 @@ textarea {
   color: var(--c-yellow);
 }
 
-.author {
-  margin-top: 5px;
-  font-family: var(--font-display);
-  background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 0.6rem;
-  text-align: right;
-}
+
 
 @media (max-width: 860px) {
-
-  .author {
-  margin-top: 5px;
-  font-family: var(--font-display);
-  background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 0.6rem;
-  text-align: right;
-}
 
   .header-brand-name {
   font-family: var(--font-display);
