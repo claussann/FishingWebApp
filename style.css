@@ -35,6 +35,7 @@
   --font-body: 'Nunito', sans-serif;
   --header-h: 66px;
 }
+
 *,
 *::before,
 *::after {
@@ -166,7 +167,8 @@ textarea {
 }
 
 
-  .author {
+.author {
+  display: inline-block;
   margin-top: 5px;
   font-family: var(--font-display);
   background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
@@ -404,16 +406,20 @@ textarea {
 
 @media (max-width: 860px) {
 
+  .author {
+    font-size: 0.75rem;
+  }
+
   .header-brand-name {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
-}
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--c-teal), var(--c-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+  }
 
   .navbar {
     display: none;
@@ -542,6 +548,7 @@ textarea {
     font-size: 2.5rem;
   }
 }
+
 /* Mobile nav dropdown */
 .mobile-nav {
   position: fixed;
