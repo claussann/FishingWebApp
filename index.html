@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fishing Inventory</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===================== SPLASH SCREEN ===================== -->
+  <div id="splash-screen">
+    <div class="splash-bubbles">
+      <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
+      <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
+    </div>
+    <div class="splash-content">
+      <div class="splash-logo-wrap">
+        <svg class="splash-svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="65" cy="65" r="60" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+          <ellipse cx="62" cy="68" rx="28" ry="16" fill="white" opacity="0.95"/>
+          <polygon points="90,68 106,55 106,81" fill="white" opacity="0.75"/>
+          <circle cx="47" cy="64" r="5" fill="#1a3a5c"/>
+          <circle cx="45.5" cy="62.5" r="2" fill="white"/>
+          <path d="M62 52 Q70 42 78 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+          <line x1="28" y1="20" x2="90" y2="57" stroke="#FFD166" stroke-width="3" stroke-linecap="round"/>
+          <line x1="90" y1="57" x2="90" y2="78" stroke="#FFD166" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
+          <ellipse cx="90" cy="82" rx="6" ry="4" fill="#FF6B6B"/>
+          <ellipse cx="90" cy="79" rx="6" ry="3.5" fill="#FF4444"/>
+        </svg>
+      </div>
+      <h1 class="splash-title">Fishing<br>Inventory</h1>
+      <p class="splash-tagline">Il tuo diario di pesca digitale 🎣</p>
+      <div class="splash-loader-wrap">
+        <div class="splash-loader-bar">
+          <div class="splash-loader-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== APP ===================== -->
+  <div id="app" class="hidden">
+
+    <!-- HEADER -->
+    <header id="main-header">
+      <div class="header-brand">
+        <svg class="header-logo-svg" viewBox="0 0 48 48" fill="none">
+          <ellipse cx="22" cy="25" rx="13" ry="8" fill="#fff"/>
+          <polygon points="35,25 44,18 44,32" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="16" cy="23" r="2.5" fill="#1a3a5c"/>
+          <line x1="10" y1="9" x2="35" y2="23" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="35" y1="23" x2="35" y2="33" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <circle cx="35" cy="36" r="3" fill="#FF6B6B"/>
+        </svg>
+        <span class="header-brand-name">Fishing Inventory</span>
+      </div>
+      <nav class="navbar">
+        <button class="nav-btn active" data-section="home">🏠 Home</button>
+        <button class="nav-btn" data-section="attrezzatura">🎣 Attrezzatura</button>
+        <button class="nav-btn" data-section="spot">📍 Spot</button>
+        <button class="nav-btn" data-section="diario">📔 Diario</button>
+        <button class="nav-btn" data-section="statistiche">📊 Statistiche</button>
+        <button class="nav-btn nav-backup" id="btn-backup">💾 Esporta</button>
+        <button class="nav-btn nav-import" id="btn-import">📂 Importa</button>
+        <button class="theme-toggle" id="btn-theme" title="Cambia tema">🌙</button>
+      </nav>
+      <button class="hamburger" id="hamburger">☰</button>
+    </header>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav hidden" id="mobile-nav">
+      <button class="mob-btn" data-section="home">🏠 Home</button>
+      <button class="mob-btn" data-section="attrezzatura">🎣 Attrezzatura</button>
+      <button class="mob-btn" data-section="spot">📍 Spot</button>
+      <button class="mob-btn" data-section="diario">📔 Diario</button>
+      <button class="mob-btn" data-section="statistiche">📊 Statistiche</button>
+      <button class="mob-btn mob-backup" id="btn-backup-mob">💾 Esporta Backup</button>
+      <button class="mob-btn mob-import" id="btn-import-mob">📂 Importa Backup</button>
+      <button class="mob-btn mob-theme" id="btn-theme-mob">🌙 Cambia Tema</button>
+    </div>
+
+    <!-- ============ HOME ============ -->
+    <section id="section-home" class="section active">
+      <div class="home-hero">
+        <div class="hero-text">
+          <h2 class="hero-title">Ciao, pescatore! 👋</h2>
+          <p class="hero-sub">Gestisci attrezzatura, spot, uscite e statistiche tutto in un posto.</p>
+        </div>
+        <div class="hero-fish-deco">🐟</div>
+      </div>
+
+      <div class="home-grid">
+        <!-- METEO -->
+        <div class="card card-meteo">
+          <div class="card-head">
+            <span class="card-emoji" id="meteo-icon-display">🌤️</span>
+            <div>
+              <h3>Meteo per la Pesca</h3>
+              <p class="card-sub">Cerca la tua città</p>
+            </div>
+          </div>
+          <div class="meteo-search-row">
+            <input type="text" id="meteo-city" placeholder="Es: Roma, Milano..." />
+            <button id="btn-meteo" class="btn-primary">Cerca</button>
+          </div>
+          <div id="meteo-loading" class="info-msg hidden">⏳ Ricerca...</div>
+          <div id="meteo-error" class="error-msg hidden">❌ Città non trovata.</div>
+          <div id="meteo-result" class="meteo-result hidden">
+            <div class="meteo-main">
+              <span class="meteo-temp" id="meteo-temp">--</span>
+              <div>
+                <div class="meteo-city-name" id="meteo-city-name"></div>
+                <div class="meteo-desc" id="meteo-desc"></div>
+              </div>
+            </div>
+            <div class="meteo-chips" id="meteo-extra"></div>
+          </div>
+        </div>
+
+        <!-- STATS RAPIDE -->
+        <div class="card card-stats">
+          <div class="card-head">
+            <span class="card-emoji">📊</span>
+            <div><h3>Il tuo Inventario</h3></div>
+          </div>
+          <div class="quick-stats-grid">
+            <div class="qstat" onclick="showSection('attrezzatura')">
+              <span class="qstat-icon">🎣</span>
+              <span class="qstat-num" id="stat-att">0</span>
+              <span class="qstat-label">Attrezzature</span>
+            </div>
+            <div class="qstat" onclick="showSection('spot')">
+              <span class="qstat-icon">📍</span>
+              <span class="qstat-num" id="stat-spot">0</span>
+              <span class="qstat-label">Spot</span>
+            </div>
+            <div class="qstat" onclick="showSection('diario')">
+              <span class="qstat-icon">📔</span>
+              <span class="qstat-num" id="stat-uscite">0</span>
+              <span class="qstat-label">Uscite</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ULTIMA USCITA -->
+        <div class="card card-ultima">
+          <div class="card-head">
+            <span class="card-emoji">🕐</span>
+            <div><h3>Ultima Uscita</h3></div>
+          </div>
+          <div id="ultima-uscita-content">
+            <p class="empty-inline">Nessuna uscita registrata ancora.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ATTREZZATURA ============ -->
+    <section id="section-attrezzatura" class="section hidden">
+      <div class="section-inner">
+        <div class="att-layout">
+          <aside class="sidebar">
+            <h3 class="sidebar-title">Filtri</h3>
+            <button class="filter-btn active" data-filter="tutti">🗂️ Tutti</button>
+            <button class="filter-btn" data-filter="canna">🎣 Canne</button>
+            <button class="filter-btn" data-filter="mulinello">⚙️ Mulinelli</button>
+            <button class="filter-btn" data-filter="minuteria">🪝 Minuteria</button>
+            <div class="sidebar-count" id="sidebar-count">0 elementi</div>
+          </aside>
+          <div class="att-main">
+            <div class="section-top-bar">
+              <h2 class="page-title">🎣 Attrezzatura</h2>
+              <button class="btn-primary" id="btn-add-att">➕ Aggiungi</button>
+            </div>
+            <div id="att-list" class="grid-list">
+              <div class="empty-state" id="att-empty">
+                <div class="empty-icon">🎣</div>
+                <p>Nessuna attrezzatura.<br>Aggiungine una!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SPOT ============ -->
+    <section id="section-spot" class="section hidden">
+      <div class="section-inner">
+        <div class="section-top-bar">
+          <h2 class="page-title">📍 Spot di Pesca</h2>
+          <button class="btn-primary" id="btn-save-spot">📌 Salva Spot</button>
+        </div>
+        <div id="geo-error" class="error-msg hidden">❌ Geolocalizzazione non disponibile.</div>
+        <div id="map" class="map-container"></div>
+        <h3 class="sub-title">Spot Salvati</h3>
+        <div id="spot-list" class="grid-list">
+          <div class="empty-state" id="spot-empty">
+            <div class="empty-icon">📍</div>
+            <p>Nessuno spot salvato.<br>Clicca sulla mappa e salva!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DIARIO ============ -->
+    <section id="section-diario" class="section hidden">
+      <div class="section-inner">
+        <div class="section-top-bar">
+          <h2 class="page-title">📔 Diario Uscite</h2>
+          <button class="btn-primary" id="btn-add-uscita">➕ Nuova Uscita</button>
+        </div>
+        <div id="diario-list" class="diario-list">
+          <div class="empty-state" id="diario-empty">
+            <div class="empty-icon">📔</div>
+            <p>Nessuna uscita registrata.<br>Aggiungi la tua prima avventura!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATISTICHE ============ -->
+    <section id="section-statistiche" class="section hidden">
+      <div class="section-inner">
+        <h2 class="page-title">📊 Statistiche</h2>
+        <div class="stats-layout">
+          <!-- Grafico uscite per mese -->
+          <div class="card stat-card-big">
+            <div class="card-head">
+              <span class="card-emoji">📅</span>
+              <div>
+                <h3>Uscite per Mese</h3>
+                <p class="card-sub" id="stats-year-label">Anno corrente</p>
+              </div>
+              <div class="year-nav">
+                <button class="btn-year" id="btn-year-prev">◀</button>
+                <span id="stats-year">2025</span>
+                <button class="btn-year" id="btn-year-next">▶</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="chart-uscite"></canvas>
+              <div id="chart-empty" class="chart-empty hidden">
+                <span>📊</span>
+                <p>Nessuna uscita nell'anno selezionato</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Riepilogo numerico -->
+          <div class="stats-mini-grid">
+            <div class="card mini-stat">
+              <span class="mini-stat-icon">📔</span>
+              <span class="mini-stat-num" id="ms-tot-uscite">0</span>
+              <span class="mini-stat-label">Uscite Totali</span>
+            </div>
+            <div class="card mini-stat">
+              <span class="mini-stat-icon">📍</span>
+              <span class="mini-stat-num" id="ms-spot-unici">0</span>
+              <span class="mini-stat-label">Spot Visitati</span>
+            </div>
+            <div class="card mini-stat">
+              <span class="mini-stat-icon">🎣</span>
+              <span class="mini-stat-num" id="ms-att-usate">0</span>
+              <span class="mini-stat-label">Attrezz. Usate</span>
+            </div>
+            <div class="card mini-stat">
+              <span class="mini-stat-icon">📅</span>
+              <span class="mini-stat-num" id="ms-mese-top">-</span>
+              <span class="mini-stat-label">Mese Top</span>
+            </div>
+          </div>
+
+          <!-- Spot più visitati -->
+          <div class="card stat-card-big">
+            <div class="card-head">
+              <span class="card-emoji">🏆</span>
+              <div><h3>Spot Più Visitati</h3></div>
+            </div>
+            <div id="top-spot-list" class="top-list">
+              <p class="empty-inline">Nessun dato disponibile.</p>
+            </div>
+          </div>
+
+          <!-- Attrezzatura più usata -->
+          <div class="card stat-card-big">
+            <div class="card-head">
+              <span class="card-emoji">⭐</span>
+              <div><h3>Attrezzatura Più Usata</h3></div>
+            </div>
+            <div id="top-att-list" class="top-list">
+              <p class="empty-inline">Nessun dato disponibile.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /app -->
+
+  <!-- ===== MODALI ===== -->
+
+  <!-- MODALE ATTREZZATURA -->
+  <div id="modal-att" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>➕ Nuova Attrezzatura</h3>
+        <button class="modal-close" id="modal-att-close">✕</button>
+      </div>
+      <form id="form-att" class="modal-form" novalidate>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="att-tipo" required>
+            <option value="">-- Seleziona tipo --</option>
+            <option value="canna">🎣 Canna</option>
+            <option value="mulinello">⚙️ Mulinello</option>
+            <option value="minuteria">🪝 Minuteria</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ambiente di Pesca</label>
+          <select id="att-ambiente">
+            <option value="">-- Seleziona ambiente --</option>
+            <option value="mare">🌊 Mare</option>
+            <option value="barca">⛵ Barca</option>
+            <option value="dolce">🏞️ Acqua Dolce</option>
+          </select>
+        </div>
+        <div class="form-group" id="att-tecnica-group" style="display:none">
+          <label>Tecnica di Pesca</label>
+          <select id="att-tecnica">
+            <option value="">-- Seleziona tecnica --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="att-nome" placeholder="Es: Shimano Stradic FL 4000" required />
+        </div>
+        <div class="form-group">
+          <label>Tipologia / Grammatura</label>
+          <input type="text" id="att-tipologia" placeholder="Es: Spinning, 20g, Match..." />
+        </div>
+        <div class="form-group">
+          <label>Quantità</label>
+          <input type="number" id="att-quantita" min="1" value="1" placeholder="1" />
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <textarea id="att-note" placeholder="Note aggiuntive..." rows="2"></textarea>
+        </div>
+        <div class="form-error hidden" id="form-att-error">Compila i campi obbligatori.</div>
+        <button type="submit" class="btn-primary btn-full">💾 Salva</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE SPOT -->
+  <div id="modal-spot" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📌 Salva Spot</h3>
+        <button class="modal-close" id="modal-spot-close">✕</button>
+      </div>
+      <form id="form-spot" class="modal-form" novalidate>
+        <div class="form-group">
+          <label>Nome Spot *</label>
+          <input type="text" id="spot-nome" placeholder="Es: Lago di Como - Nord" required />
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="spot-categoria">
+            <option value="">-- Seleziona categoria --</option>
+            <option value="spiaggia">🏖️ Spiaggia</option>
+            <option value="scogliera">🪨 Scogliera</option>
+            <option value="porto">⚓ Porto / Molo</option>
+            <option value="diga">🚧 Diga / Frangiflutti</option>
+            <option value="mare-aperto">🌊 Mare Aperto</option>
+            <option value="laguna">🐟 Laguna / Estuario</option>
+            <option value="lago">🏞️ Lago</option>
+            <option value="fiume">〰️ Fiume</option>
+            <option value="torrente">💧 Torrente</option>
+            <option value="canale">🌿 Canale</option>
+            <option value="diga-invaso">🏔️ Diga / Invaso</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <textarea id="spot-note" placeholder="Tipo pesca, specie, orari..." rows="2"></textarea>
+        </div>
+        <div class="spot-coords-preview" id="spot-coords-preview"></div>
+        <div class="form-error hidden" id="form-spot-error">Inserisci il nome dello spot.</div>
+        <button type="submit" class="btn-primary btn-full">📌 Salva Spot</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE USCITA -->
+  <div id="modal-uscita" class="modal-overlay hidden">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3>📔 Nuova Uscita</h3>
+        <button class="modal-close" id="modal-uscita-close">✕</button>
+      </div>
+      <form id="form-uscita" class="modal-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data *</label>
+            <input type="date" id="uscita-data" required />
+          </div>
+          <div class="form-group">
+            <label>Orario</label>
+            <input type="time" id="uscita-ora" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Spot utilizzato</label>
+          <select id="uscita-spot">
+            <option value="">-- Nessuno / Non salvato --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Attrezzatura utilizzata</label>
+          <div id="uscita-att-checks" class="checks-grid"></div>
+        </div>
+        <div class="form-group">
+          <label>Note / Commenti</label>
+          <textarea id="uscita-note" placeholder="Come è andata? Catture, condizioni meteo, osservazioni..." rows="3"></textarea>
+        </div>
+        <div class="form-error hidden" id="form-uscita-error">Inserisci almeno la data.</div>
+        <button type="submit" class="btn-primary btn-full">💾 Salva Uscita</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Input file nascosto per importazione JSON -->
+  <input type="file" id="import-file-input" accept=".json" style="display:none" />
+
+  <!-- MODALE CONFERMA IMPORTAZIONE -->
+  <div id="modal-import" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📂 Importa Backup</h3>
+        <button class="modal-close" id="modal-import-close">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="import-info">
+          <div class="import-preview" id="import-preview"></div>
+          <div class="import-warning">
+            ⚠️ <strong>Attenzione:</strong> l'importazione sovrascriverà tutti i dati attuali (attrezzatura, spot e diario). Questa operazione non è reversibile.
+          </div>
+        </div>
+        <div class="form-error hidden" id="import-error">File non valido o corrotto.</div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button class="btn-cancel btn-full" id="btn-import-cancel">✕ Annulla</button>
+          <button class="btn-primary btn-full" id="btn-import-confirm">✅ Conferma Importazione</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
