@@ -7,11 +7,9 @@
 ## 🇮🇹 Italiano
 
 ### Descrizione
-
 **Fishing Inventory** è una web app frontend-only per gestire la tua attrezzatura da pesca, salvare i tuoi spot preferiti, tenere un diario delle uscite e consultare le statistiche — tutto salvato in locale sul tuo browser, senza nessun account o server.
 
 ### ✨ Funzionalità
-
 - 🌤️ **Meteo in tempo reale** — cerca qualsiasi città e ottieni temperatura, vento e umidità (API Open-Meteo + Nominatim, completamente gratuite)
 - 🎣 **Gestione Attrezzatura** — aggiungi canne, mulinelli e minuteria con tipo, ambiente di pesca (mare, barca, acqua dolce), tecnica, grammatura, quantità e note
 - 📍 **Spot di Pesca** — salva i tuoi spot sulla mappa con geolocalizzazione GPS, categoria (spiaggia, lago, fiume...) e note
@@ -21,7 +19,6 @@
 - 🌙☀️ **Tema Dark / Light** — cambia tema con un click, preferenza salvata automaticamente
 
 ### 🗺️ Tecnologie Utilizzate
-
 | Tecnologia | Utilizzo |
 |---|---|
 | HTML / CSS / JavaScript vanilla | Core dell'applicazione |
@@ -37,7 +34,7 @@ Non è richiesta nessuna installazione. Basta:
 
 1. Clona o scarica la repository
 ```bash
-git clone https://github.com/claussann/FishingWebApp.git
+git clone https://github.com/tuo-username/fishing-inventory.git
 ```
 2. Entra nella cartella
 ```bash
@@ -71,6 +68,9 @@ Tutte le variabili di stile si trovano in cima a `style.css` nella sezione `:roo
 
 ### 📱 Versione Mobile
 È in sviluppo una versione **React Native** con Expo che include funzionalità aggiuntive come foto attrezzatura dalla fotocamera, notifiche e promemoria, e GPS nativo.
+
+### 📄 Licenza
+Questo progetto è rilasciato sotto licenza [MIT](LICENSE).
 
 ---
 
@@ -139,6 +139,11 @@ All style variables are at the top of `style.css` in the `:root` section. You ca
 ### 📱 Mobile Version
 A **React Native** version with Expo is in development, featuring additional capabilities such as gear photos from the camera, push notifications and reminders, and native GPS.
 
+### 📄 License
+This project is released under the [MIT](LICENSE) license.
+
 ---
 
-Made with ❤️ and 🎣
+<div align="center">
+  Made with ❤️ and 🎣
+</div>

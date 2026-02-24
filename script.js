@@ -16,10 +16,11 @@
 /* ============================================================
    KEYS LOCALSTORAGE
    ============================================================ */
-const LS_ATT    = 'fi_attrezzatura';
-const LS_SPOT   = 'fi_spot';
-const LS_DIARIO = 'fi_diario';
-const LS_THEME  = 'fi_theme';
+const LS_ATT     = 'fi_attrezzatura';
+const LS_SPOT    = 'fi_spot';
+const LS_DIARIO  = 'fi_diario';
+const LS_THEME   = 'fi_theme';
+const LS_CATTURE = 'fi_catture';
 
 /* ============================================================
    DATI TECNICHE DI PESCA
@@ -97,6 +98,7 @@ let currentLatLng = null;
 let spotMarkers   = [];
 let currentFilter = 'tutti';
 let statsYear     = new Date().getFullYear();
+let currentSection = 'home'; // traccia sezione attiva
 
 /* ============================================================
    UTILITY
@@ -126,29 +128,53 @@ function initSplash() {
   const splash = document.getElementById('splash-screen');
   const app    = document.getElementById('app');
 
-  setTimeout(() => {
+  // Funzione sicura per avviare l'app — cattura errori JS
+  function launchApp() {
     splash.style.transition = 'opacity 0.7s ease';
     splash.style.opacity = '0';
     setTimeout(() => {
       splash.style.display = 'none';
       app.classList.remove('hidden');
-      initApp();
+      try {
+        initApp();
+      } catch(err) {
+        console.error('Errore initApp:', err);
+        // Mostra l'app comunque anche se qualcosa fallisce
+        app.classList.remove('hidden');
+      }
     }, 700);
-  }, 5000);
+  }
+
+  setTimeout(launchApp, 5000);
+
+  // Failsafe: se dopo 8 secondi lo splash è ancora visibile, forza la chiusura
+  setTimeout(() => {
+    if (splash.style.display !== 'none') {
+      console.warn('Failsafe splash: forzata chiusura');
+      splash.style.display = 'none';
+      app.classList.remove('hidden');
+      try { initApp(); } catch(e) { console.error(e); }
+    }
+  }, 8000);
 }
 
 /* ============================================================
    INIT APP
    ============================================================ */
 function initApp() {
+  // Carica Google Fonts in modo non bloccante (non indispensabili)
+  loadExternalCSS('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+
   initTheme();
   initNavbar();
   initMeteo();
   initAttrezzaturaEvents();
   initSpotEvents();
   initDiarioEvents();
+  initCattureEvents();
   initStatisticheEvents();
   initBackup();
+  initPWA();
   updateStats();
   renderUltimaUscita();
 }
@@ -190,6 +216,7 @@ function applyTheme(theme) {
 
 
 function showSection(name) {
+  currentSection = name;
   // Chiudi mobile nav se aperto
   document.getElementById('mobile-nav').classList.add('hidden');
 
@@ -206,11 +233,11 @@ function showSection(name) {
   else if (name === 'spot') {
     setTimeout(() => {
       if (!map) initMap();
-      else { map.invalidateSize(); }
-      renderSpotList();
+      else if (typeof map.invalidateSize === 'function') { map.invalidateSize(); renderSpotList(); }
     }, 120);
   }
   else if (name === 'diario') renderDiario();
+  else if (name === 'catture') renderCatture();
   else if (name === 'statistiche') {
     statsYear = new Date().getFullYear();
     document.getElementById('stats-year').textContent = statsYear;
@@ -239,9 +266,10 @@ function initNavbar() {
 
 function updateStats() {
   const s = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  s('stat-att',    lsGet(LS_ATT).length);
-  s('stat-spot',   lsGet(LS_SPOT).length);
-  s('stat-uscite', lsGet(LS_DIARIO).length);
+  s('stat-att',     lsGet(LS_ATT).length);
+  s('stat-spot',    lsGet(LS_SPOT).length);
+  s('stat-uscite',  lsGet(LS_DIARIO).length);
+  s('stat-catture', lsGet(LS_CATTURE).length);
 }
 
 /* ============================================================
@@ -424,6 +452,7 @@ function saveAttrezzatura(e) {
   closeModalAtt();
   renderAttrezzatura();
   updateStats();
+  triggerAutosave();
 }
 
 function renderAttrezzatura() {
@@ -480,9 +509,11 @@ function renderAttrezzatura() {
 }
 
 function deleteAttrezzatura(id) {
+  if (!confirm('Eliminare questa attrezzatura?')) return;
   lsSet(LS_ATT, lsGet(LS_ATT).filter(i => i.id !== id));
   renderAttrezzatura();
   updateStats();
+  triggerAutosave();
 }
 
 /* ============================================================
@@ -495,9 +526,59 @@ function initSpotEvents() {
     if (e.target === document.getElementById('modal-spot')) closeModalSpot();
   });
   document.getElementById('form-spot').addEventListener('submit', saveSpot);
+
+  // Foto spot
+  initFotoInput('spot-foto-input', 'spot-foto-img', 'spot-foto-preview', '_spotFotoBase64');
+  document.getElementById('spot-foto-remove').addEventListener('click', () => {
+    resetFoto('spot-foto-input', 'spot-foto-img', 'spot-foto-preview', '_spotFotoBase64');
+  });
 }
 
+function closeModalSpot() {
+  document.getElementById('modal-spot').classList.add('hidden');
+  document.getElementById('form-spot').reset();
+  document.getElementById('form-spot-error').classList.add('hidden');
+  resetFoto('spot-foto-input', 'spot-foto-img', 'spot-foto-preview', '_spotFotoBase64');
+}
+
+
 function initMap() {
+  // Carica Leaflet dinamicamente solo quando serve la mappa
+  if (typeof L === 'undefined') {
+    loadLeaflet()
+      .then(() => buildMap())
+      .catch(() => {
+        document.getElementById('map').innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--c-white60);flex-direction:column;gap:12px">' +
+          '<span style="font-size:2rem">🗺️</span>' +
+          '<p style="text-align:center;font-size:0.9rem">Mappa non disponibile offline.<br>Connettiti a internet per usare gli Spot.</p>' +
+          '</div>';
+      });
+    return;
+  }
+  buildMap();
+}
+
+function loadExternalCSS(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel  = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
+function loadLeaflet() {
+  return new Promise((resolve, reject) => {
+    loadExternalCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload  = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+function buildMap() {
   map = L.map('map').setView([41.9, 12.5], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -551,12 +632,6 @@ function openSpotModal() {
   document.getElementById('modal-spot').classList.remove('hidden');
 }
 
-function closeModalSpot() {
-  document.getElementById('modal-spot').classList.add('hidden');
-  document.getElementById('form-spot').reset();
-  document.getElementById('form-spot-error').classList.add('hidden');
-}
-
 function saveSpot(e) {
   e.preventDefault();
   const nome      = document.getElementById('spot-nome').value.trim();
@@ -564,8 +639,10 @@ function saveSpot(e) {
   const categoria = document.getElementById('spot-categoria').value;
   if (!nome) { document.getElementById('form-spot-error').classList.remove('hidden'); return; }
 
+  const foto = window._spotFotoBase64 || null;
+
   const spot = {
-    id: genId(), nome, note, categoria,
+    id: genId(), nome, note, categoria, foto,
     lat: currentLatLng.lat, lng: currentLatLng.lng,
     createdAt: new Date().toISOString()
   };
@@ -577,6 +654,17 @@ function saveSpot(e) {
   closeModalSpot();
   renderSpotList();
   updateStats();
+  triggerAutosave();
+}
+
+function closeModalSpot() {
+  document.getElementById('modal-spot').classList.add('hidden');
+  document.getElementById('form-spot').reset();
+  document.getElementById('form-spot-error').classList.add('hidden');
+  // Reset foto
+  window._spotFotoBase64 = null;
+  document.getElementById('spot-foto-preview').classList.add('hidden');
+  document.getElementById('spot-foto-img').src = '';
 }
 
 function addSpotMarker(spot) {
@@ -610,7 +698,11 @@ function renderSpotList() {
     const card = document.createElement('div');
     card.className = 'spot-item';
     const catLabel = spot.categoria ? SPOT_CAT_LABELS[spot.categoria] || spot.categoria : null;
+    const fotoHtml = spot.foto
+      ? `<img class="spot-foto-card" src="${spot.foto}" alt="Foto spot" onclick="openFotoFullscreen('${spot.id}','spot')" />`
+      : '';
     card.innerHTML = `
+      ${fotoHtml}
       <div class="spot-item-header">
         <span class="spot-nome">🎣 ${escHtml(spot.nome)}</span>
         ${catLabel ? `<span class="spot-cat-badge">${catLabel}</span>` : ''}
@@ -619,7 +711,7 @@ function renderSpotList() {
       ${spot.note ? `<div class="spot-note-text">${escHtml(spot.note)}</div>` : ''}
       <span class="spot-date">📅 ${fmtDate(spot.createdAt)}</span>
       <div class="spot-actions">
-        <button class="btn-go-spot" data-lat="${spot.lat}" data-lng="${spot.lng}" data-id="${spot.id}">🗺️ Vedi mappa</button>
+        <button class="btn-go-spot" data-id="${spot.id}">🗺️ Vedi mappa</button>
         <button class="btn-delete" data-id="${spot.id}">🗑️ Elimina</button>
       </div>
     `;
@@ -637,11 +729,13 @@ function renderSpotList() {
 }
 
 function deleteSpot(id) {
+  if (!confirm('Eliminare questo spot?')) return;
   lsSet(LS_SPOT, lsGet(LS_SPOT).filter(s => s.id !== id));
   const found = spotMarkers.find(m => m.id === id);
   if (found && map) { map.removeLayer(found.marker); spotMarkers = spotMarkers.filter(m => m.id !== id); }
   renderSpotList();
   updateStats();
+  triggerAutosave();
 }
 
 /* ============================================================
@@ -724,6 +818,7 @@ function saveUscita(e) {
   renderDiario();
   updateStats();
   renderUltimaUscita();
+  triggerAutosave();
 }
 
 function renderDiario() {
@@ -772,10 +867,12 @@ function renderDiario() {
 }
 
 function deleteUscita(id) {
+  if (!confirm('Eliminare questa uscita?')) return;
   lsSet(LS_DIARIO, lsGet(LS_DIARIO).filter(u => u.id !== id));
   renderDiario();
   updateStats();
   renderUltimaUscita();
+  triggerAutosave();
 }
 
 /* ============================================================
@@ -963,56 +1060,84 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 /* ============================================================
-   BACKUP — ESPORTA
+   BACKUP — SALVA / CARICA + AUTOSAVE
    ============================================================ */
+
+// Handle per il File System Access API (sostituzione file)
+let _fsaFileHandle = null;
+let _autosaveEnabled = false;
+const LS_AUTOSAVE = 'fi_autosave';
+
 function initBackup() {
-  // --- ESPORTA ---
-  const doExport = () => {
-    const backup = {
-      exportDate:   new Date().toISOString(),
-      version:      '2.0',
-      attrezzatura: lsGet(LS_ATT),
-      spot:         lsGet(LS_SPOT),
-      diario:       lsGet(LS_DIARIO),
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `fishing-inventory-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  // Ripristina stato autosave
+  _autosaveEnabled = localStorage.getItem(LS_AUTOSAVE) === 'true';
+  const toggle = document.getElementById('autosave-toggle');
+  if (toggle) {
+    toggle.checked = _autosaveEnabled;
+    updateAutosaveLabel();
+    toggle.addEventListener('change', onAutosaveToggle);
+  }
 
-  document.getElementById('btn-backup').addEventListener('click', doExport);
+  // ---- SALVA: mostra popup info prima di scaricare ----
+  const openSalvaInfo = () => {
+    document.getElementById('mobile-nav').classList.add('hidden');
+    document.getElementById('modal-salva-info').classList.remove('hidden');
+  };
+  document.getElementById('btn-backup').addEventListener('click', openSalvaInfo);
   const mobBackup = document.getElementById('btn-backup-mob');
-  if (mobBackup) mobBackup.addEventListener('click', doExport);
+  if (mobBackup) mobBackup.addEventListener('click', openSalvaInfo);
 
-  // --- IMPORTA ---
-  const fileInput = document.getElementById('import-file-input');
+  // Chiudi modale salva info
+  document.getElementById('modal-salva-info-close').addEventListener('click', () => {
+    document.getElementById('modal-salva-info').classList.add('hidden');
+  });
+  document.getElementById('modal-salva-info').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-salva-info'))
+      document.getElementById('modal-salva-info').classList.add('hidden');
+  });
 
-  // Apri file picker al click dei bottoni importa
-  const openImport = () => {
-    fileInput.value = ''; // reset per permettere di selezionare lo stesso file due volte
-    fileInput.click();
+  // Bottone "Salva ora" dentro il popup
+  document.getElementById('btn-salva-confirm').addEventListener('click', () => {
+    document.getElementById('modal-salva-info').classList.add('hidden');
+    doSave();
+  });
+
+  // ---- CARICA: mostra popup info prima di aprire file picker ----
+  const openCaricaInfo = () => {
+    document.getElementById('mobile-nav').classList.add('hidden');
+    document.getElementById('modal-carica-info').classList.remove('hidden');
   };
-  document.getElementById('btn-import').addEventListener('click', openImport);
+  document.getElementById('btn-import').addEventListener('click', openCaricaInfo);
   const mobImport = document.getElementById('btn-import-mob');
-  if (mobImport) mobImport.addEventListener('click', openImport);
+  if (mobImport) mobImport.addEventListener('click', openCaricaInfo);
 
-  // Quando l'utente sceglie un file
+  // Chiudi modale carica info
+  document.getElementById('modal-carica-info-close').addEventListener('click', () => {
+    document.getElementById('modal-carica-info').classList.add('hidden');
+  });
+  document.getElementById('modal-carica-info').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-carica-info'))
+      document.getElementById('modal-carica-info').classList.add('hidden');
+  });
+
+  // Bottone "Scegli file" dentro il popup carica
+  document.getElementById('btn-carica-confirm').addEventListener('click', () => {
+    document.getElementById('modal-carica-info').classList.add('hidden');
+    fileInput.value = '';
+    fileInput.click();
+  });
+
+  // ---- FILE INPUT per importazione ----
+  const fileInput = document.getElementById('import-file-input');
   fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = evt => {
       try {
         const data = JSON.parse(evt.target.result);
         showImportPreview(data);
-      } catch (err) {
+      } catch {
         showImportError('File non valido: non è un JSON corretto.');
       }
     };
@@ -1028,6 +1153,112 @@ function initBackup() {
   });
 }
 
+/** Costruisce l'oggetto backup completo */
+function buildBackup() {
+  return {
+    exportDate:   new Date().toISOString(),
+    version:      '3.0',
+    attrezzatura: lsGet(LS_ATT),
+    spot:         lsGet(LS_SPOT),
+    diario:       lsGet(LS_DIARIO),
+    catture:      lsGet(LS_CATTURE),
+  };
+}
+
+/**
+ * Salva il backup:
+ * 1. Se File System Access API disponibile e handle esistente → sovrascrive
+ * 2. Se FSA disponibile ma nessun handle → chiede dove salvare
+ * 3. Fallback → download classico
+ */
+async function doSave(isAutosave = false) {
+  const backup = buildBackup();
+  const json   = JSON.stringify(backup, null, 2);
+  const filename = `fishing-inventory-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
+  // File System Access API (Chrome 86+, Edge 86+)
+  if ('showSaveFilePicker' in window) {
+    try {
+      if (!_fsaFileHandle || !isAutosave) {
+        // Prima volta o salvataggio manuale: apri dialog
+        _fsaFileHandle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'JSON Backup', accept: { 'application/json': ['.json'] } }],
+        });
+      }
+      const writable = await _fsaFileHandle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      if (isAutosave) {
+        showToast('🔄 Salvataggio automatico completato', 'success');
+      } else {
+        showToast('✅ File salvato con successo!', 'success');
+      }
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return; // utente ha annullato
+      // Fallback se errore FSA
+      _fsaFileHandle = null;
+    }
+  }
+
+  // Fallback: download classico
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  if (!isAutosave) showToast('✅ File salvato nella cartella Download!', 'success');
+}
+
+/** Chiamato dopo ogni modifica ai dati per il salvataggio automatico */
+function triggerAutosave() {
+  if (!_autosaveEnabled) return;
+  // Debounce: salva dopo 1 secondo dall'ultima modifica
+  clearTimeout(window._autosaveTimer);
+  window._autosaveTimer = setTimeout(() => doSave(true), 1000);
+}
+
+function onAutosaveToggle() {
+  _autosaveEnabled = document.getElementById('autosave-toggle').checked;
+  localStorage.setItem(LS_AUTOSAVE, _autosaveEnabled);
+  updateAutosaveLabel();
+
+  if (_autosaveEnabled) {
+    // Se FSA non disponibile, avvisa
+    if (!('showSaveFilePicker' in window)) {
+      showToast('⚠️ Autosave: il tuo browser userà Download standard', 'error');
+    } else {
+      showToast('✅ Salvataggio automatico attivato!', 'success');
+      // Prima attivazione: chiedi subito dove salvare
+      if (!_fsaFileHandle) doSave(false);
+    }
+  } else {
+    _fsaFileHandle = null;
+    showToast('⏹ Salvataggio automatico disattivato', 'success');
+  }
+  updateAutosaveLabel();
+}
+
+function updateAutosaveLabel() {
+  const label = document.getElementById('autosave-status-label');
+  const desc  = document.getElementById('autosave-desc');
+  if (!label) return;
+  if (_autosaveEnabled) {
+    label.textContent = '✅ Attivo';
+    label.style.color = 'var(--c-teal)';
+    if (desc) desc.textContent = 'I dati vengono salvati automaticamente ad ogni modifica.';
+  } else {
+    label.textContent = 'Disattivato';
+    label.style.color = '';
+    if (desc) desc.textContent = 'Attiva per salvare automaticamente ad ogni modifica.';
+  }
+}
+
 /** Mostra la modale con anteprima dei dati del backup da importare */
 function showImportPreview(data) {
   // Validazione struttura minima
@@ -1039,11 +1270,12 @@ function showImportPreview(data) {
     return;
   }
 
-  const att    = Array.isArray(data.attrezzatura) ? data.attrezzatura : [];
-  const spot   = Array.isArray(data.spot)         ? data.spot         : [];
-  const diario = Array.isArray(data.diario)        ? data.diario       : [];
+  const att     = Array.isArray(data.attrezzatura) ? data.attrezzatura : [];
+  const spot    = Array.isArray(data.spot)         ? data.spot         : [];
+  const diario  = Array.isArray(data.diario)       ? data.diario       : [];
+  const catture = Array.isArray(data.catture)      ? data.catture      : [];
 
-  if (!att.length && !spot.length && !diario.length) {
+  if (!att.length && !spot.length && !diario.length && !catture.length) {
     showImportError('Il file è vuoto o non contiene dati riconoscibili.');
     return;
   }
@@ -1063,11 +1295,12 @@ function showImportPreview(data) {
       <div>🎣 <strong>${att.length}</strong> attrezzature</div>
       <div>📍 <strong>${spot.length}</strong> spot di pesca</div>
       <div>📔 <strong>${diario.length}</strong> uscite nel diario</div>
+      <div>🐟 <strong>${catture.length}</strong> catture</div>
     </div>
   `;
 
   // Salva dati in memoria temporanea per il confirm
-  window._importData = { att, spot, diario };
+  window._importData = { att, spot, diario, catture };
 
   // Bottone conferma
   document.getElementById('btn-import-confirm').onclick = () => confirmImport();
@@ -1087,26 +1320,26 @@ function showImportError(msg) {
 
 /** Esegue l'importazione sovrascrivendo i dati locali */
 function confirmImport() {
-  const { att, spot, diario } = window._importData || {};
-  if (!att && !spot && !diario) return;
+  const { att, spot, diario, catture } = window._importData || {};
+  if (!att && !spot && !diario && !catture) return;
 
-  lsSet(LS_ATT,    att    || []);
-  lsSet(LS_SPOT,   spot   || []);
-  lsSet(LS_DIARIO, diario || []);
+  lsSet(LS_ATT,     att     || []);
+  lsSet(LS_SPOT,    spot    || []);
+  lsSet(LS_DIARIO,  diario  || []);
+  lsSet(LS_CATTURE, catture || []);
 
   closeModalImport();
   window._importData = null;
 
-  // Aggiorna UI
   updateStats();
   renderUltimaUscita();
 
-  // Feedback visivo
   showToast('✅ Backup importato con successo!', 'success');
+  triggerAutosave();
 
-  // Se l'utente è su una sezione già aperta, aggiornala
   if (currentSection === 'attrezzatura') renderAttrezzatura();
-  else if (currentSection === 'diario')  renderDiario();
+  else if (currentSection === 'diario')     renderDiario();
+  else if (currentSection === 'catture')    renderCatture();
   else if (currentSection === 'statistiche') renderStatistiche();
   else if (currentSection === 'spot') {
     renderSpotList();
@@ -1173,6 +1406,230 @@ window.addEventListener('resize', () => {
     }
   }, 200);
 });
+
+/* ============================================================
+   FOTO — helper condivisi
+   ============================================================ */
+/**
+ * Inizializza un input file per la foto e mostra la preview.
+ * @param {string} inputId     - id dell'input type="file"
+ * @param {string} imgId       - id dell'img preview
+ * @param {string} previewId   - id del wrapper preview
+ * @param {string} globalKey   - chiave window._xxxFotoBase64
+ */
+function initFotoInput(inputId, imgId, previewId, globalKey) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
+    // Ridimensiona e converte in base64
+    const reader = new FileReader();
+    reader.onload = evt => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1024; // px max lato
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const b64 = canvas.toDataURL('image/jpeg', 0.80);
+        window[globalKey] = b64;
+        document.getElementById(imgId).src = b64;
+        document.getElementById(previewId).classList.remove('hidden');
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Resetta stato foto */
+function resetFoto(inputId, imgId, previewId, globalKey) {
+  const input = document.getElementById(inputId);
+  if (input) input.value = '';
+  const img = document.getElementById(imgId);
+  if (img) img.src = '';
+  const prev = document.getElementById(previewId);
+  if (prev) prev.classList.add('hidden');
+  window[globalKey] = null;
+}
+
+/** Apre modale fullscreen per una foto base64 */
+function openFotoFullscreen(id, type) {
+  let lista, item;
+  if (type === 'spot')    lista = lsGet(LS_SPOT);
+  if (type === 'cattura') lista = lsGet(LS_CATTURE);
+  item = lista.find(x => x.id === id);
+  if (!item || !item.foto) return;
+  document.getElementById('modal-foto-img').src = item.foto;
+  document.getElementById('modal-foto').classList.remove('hidden');
+}
+
+/* ============================================================
+   CATTURE — CRUD
+   ============================================================ */
+function initCattureEvents() {
+  document.getElementById('btn-add-cattura').addEventListener('click', () => {
+    // Precompila data odierna
+    document.getElementById('cattura-data').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('modal-cattura').classList.remove('hidden');
+  });
+  document.getElementById('modal-cattura-close').addEventListener('click', closeModalCattura);
+  document.getElementById('modal-cattura').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-cattura')) closeModalCattura();
+  });
+  document.getElementById('form-cattura').addEventListener('submit', saveCattura);
+
+  // Foto cattura
+  initFotoInput('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
+  document.getElementById('cattura-foto-remove').addEventListener('click', () => {
+    resetFoto('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
+  });
+}
+
+function closeModalCattura() {
+  document.getElementById('modal-cattura').classList.add('hidden');
+  document.getElementById('form-cattura').reset();
+  document.getElementById('form-cattura-error').classList.add('hidden');
+  resetFoto('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
+}
+
+function saveCattura(e) {
+  e.preventDefault();
+  const data    = document.getElementById('cattura-data').value;
+  const specie  = document.getElementById('cattura-specie').value.trim();
+  const peso    = document.getElementById('cattura-peso').value;
+  const note    = document.getElementById('cattura-note').value.trim();
+  const foto    = window._catFotoBase64 || null;
+
+  if (!data || !specie) {
+    document.getElementById('form-cattura-error').classList.remove('hidden');
+    return;
+  }
+
+  const cattura = { id: genId(), data, specie, peso, note, foto, createdAt: new Date().toISOString() };
+  const lista = lsGet(LS_CATTURE);
+  lista.push(cattura);
+  lsSet(LS_CATTURE, lista);
+
+  closeModalCattura();
+  renderCatture();
+  updateStats();
+  triggerAutosave();
+}
+
+function renderCatture() {
+  const lista     = lsGet(LS_CATTURE);
+  const container = document.getElementById('catture-list');
+  const emptyEl   = document.getElementById('catture-empty');
+  container.querySelectorAll('.cattura-card, .ad-banner-catture').forEach(el => el.remove());
+
+  if (!lista.length) { emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+
+  // Ordina per data decrescente
+  const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
+
+  sorted.forEach((c, i) => {
+    // Inserisci banner AdSense ogni 6 card
+    if (i > 0 && i % 6 === 0) {
+      const adDiv = document.createElement('div');
+      adDiv.className = 'ad-banner-catture';
+      adDiv.innerHTML = '<!-- ADSENSE SLOT —  sostituire con blocco ins quando attivo -->';
+      container.appendChild(adDiv);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'cattura-card';
+
+    // Foto o placeholder
+    const fotoHtml = c.foto
+      ? `<img class="cattura-foto" src="${c.foto}" alt="Foto cattura" />`
+      : `<div class="cattura-no-foto">🐟</div>`;
+
+    const pesoHtml = c.peso
+      ? `<span class="cattura-peso-badge">⚖️ ${parseFloat(c.peso).toFixed(2)} kg</span>`
+      : '';
+
+    card.innerHTML = `
+      ${fotoHtml}
+      <div class="cattura-body">
+        <div class="cattura-header-row">
+          <span class="cattura-specie">🐟 ${escHtml(c.specie)}</span>
+          ${pesoHtml}
+        </div>
+        <span class="cattura-data">📅 ${fmtDate(c.data)}</span>
+        ${c.note ? `<div class="cattura-note-text">${escHtml(c.note)}</div>` : ''}
+      </div>
+      <div class="cattura-footer">
+        <button class="btn-delete" data-id="${c.id}">🗑️ Elimina</button>
+      </div>
+    `;
+
+    // Tap foto → fullscreen
+    if (c.foto) {
+      card.querySelector('.cattura-foto').addEventListener('click', () => openFotoFullscreen(c.id, 'cattura'));
+    }
+    card.querySelector('.btn-delete').addEventListener('click', () => deleteCattura(c.id));
+    container.appendChild(card);
+  });
+}
+
+function deleteCattura(id) {
+  if (!confirm('Eliminare questa cattura?')) return;
+  lsSet(LS_CATTURE, lsGet(LS_CATTURE).filter(c => c.id !== id));
+  renderCatture();
+  updateStats();
+  triggerAutosave();
+}
+
+/* ============================================================
+   PWA — Install prompt
+   ============================================================ */
+function initPWA() {
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Mostra bottone install
+    document.getElementById('btn-pwa-install').classList.remove('hidden');
+    const mobPwa = document.getElementById('btn-pwa-mob');
+    if (mobPwa) mobPwa.classList.remove('hidden');
+  });
+
+  const doInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (outcome === 'accepted') {
+      document.getElementById('btn-pwa-install').classList.add('hidden');
+      const mobPwa = document.getElementById('btn-pwa-mob');
+      if (mobPwa) mobPwa.classList.add('hidden');
+      showToast('✅ App installata con successo!', 'success');
+    }
+  };
+
+  document.getElementById('btn-pwa-install').addEventListener('click', doInstall);
+  const mobPwa = document.getElementById('btn-pwa-mob');
+  if (mobPwa) mobPwa.addEventListener('click', () => {
+    doInstall();
+    document.getElementById('mobile-nav').classList.add('hidden');
+  });
+
+  // Già installata
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('btn-pwa-install').classList.add('hidden');
+    const mp = document.getElementById('btn-pwa-mob');
+    if (mp) mp.classList.add('hidden');
+  });
+}
 
 /* ============================================================
    AVVIO
