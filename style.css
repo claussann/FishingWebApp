@@ -940,6 +940,15 @@ body.light .splash-loader-bar { background: rgba(15,30,48,0.15); }
 /* ============================================================
    ADSENSE BANNER SLOTS
    ============================================================ */
+/* Banner in fondo ad ogni sezione */
+.ad-section-banner {
+  width: 100%;
+  max-width: 960px;
+  margin: 24px auto 0;
+  min-height: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
 /* Banner top homepage */
 .ad-banner-top {
   width: 100%;
