@@ -21,6 +21,7 @@
 ### 🗺️ Tecnologie Utilizzate
 | Tecnologia | Utilizzo |
 |---|---|
+| Claude.ai | App core |
 | HTML / CSS / JavaScript vanilla | Core dell'applicazione |
 | [Leaflet.js](https://leafletjs.com/) | Mappa interattiva |
 | [OpenStreetMap](https://www.openstreetmap.org/) | Tile della mappa (gratuito) |
@@ -91,6 +92,7 @@ Questo progetto è rilasciato sotto licenza [MIT](LICENSE).
 ### 🗺️ Technologies Used
 | Technology | Purpose |
 |---|---|
+| Claude.ai | App core |
 | HTML / CSS / Vanilla JavaScript | App core |
 | [Leaflet.js](https://leafletjs.com/) | Interactive map |
 | [OpenStreetMap](https://www.openstreetmap.org/) | Map tiles (free) |

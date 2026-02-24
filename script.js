@@ -162,7 +162,14 @@ function initSplash() {
    INIT APP
    ============================================================ */
 function initApp() {
-  // Carica Google Fonts in modo non bloccante (non indispensabili)
+  // Registra Service Worker per PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registrato:', reg.scope))
+      .catch(err => console.warn('SW non registrato:', err));
+  }
+
+  // Carica Google Fonts in modo non bloccante
   loadExternalCSS('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
 
   initTheme();
@@ -1594,40 +1601,59 @@ function deleteCattura(id) {
 function initPWA() {
   let deferredPrompt = null;
 
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    // Mostra bottone install
-    document.getElementById('btn-pwa-install').classList.remove('hidden');
-    const mobPwa = document.getElementById('btn-pwa-mob');
-    if (mobPwa) mobPwa.classList.remove('hidden');
-  });
+  const btnDesktop = document.getElementById('btn-pwa-install');
+  const btnMob     = document.getElementById('btn-pwa-mob');
+  const banner     = document.getElementById('install-banner');
+  const btnBanner  = document.getElementById('btn-install-banner');
+  const btnBannerX = document.getElementById('btn-install-banner-close');
 
-  const doInstall = async () => {
+  function showInstallUI() {
+    // Bottone header desktop
+    if (btnDesktop) btnDesktop.classList.remove('hidden');
+    // Bottone menu mobile
+    if (btnMob) btnMob.classList.remove('hidden');
+    // Banner nella home
+    if (banner) banner.classList.remove('hidden');
+  }
+
+  function hideInstallUI() {
+    if (btnDesktop) btnDesktop.classList.add('hidden');
+    if (btnMob)     btnMob.classList.add('hidden');
+    if (banner)     banner.classList.add('hidden');
+  }
+
+  async function doInstall() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     deferredPrompt = null;
     if (outcome === 'accepted') {
-      document.getElementById('btn-pwa-install').classList.add('hidden');
-      const mobPwa = document.getElementById('btn-pwa-mob');
-      if (mobPwa) mobPwa.classList.add('hidden');
+      hideInstallUI();
       showToast('✅ App installata con successo!', 'success');
     }
-  };
+  }
 
-  document.getElementById('btn-pwa-install').addEventListener('click', doInstall);
-  const mobPwa = document.getElementById('btn-pwa-mob');
-  if (mobPwa) mobPwa.addEventListener('click', () => {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallUI();
+  });
+
+  if (btnDesktop) btnDesktop.addEventListener('click', doInstall);
+
+  if (btnMob) btnMob.addEventListener('click', () => {
     doInstall();
     document.getElementById('mobile-nav').classList.add('hidden');
   });
 
-  // Già installata
+  if (btnBanner)  btnBanner.addEventListener('click', doInstall);
+  if (btnBannerX) btnBannerX.addEventListener('click', () => {
+    if (banner) banner.classList.add('hidden');
+  });
+
   window.addEventListener('appinstalled', () => {
-    document.getElementById('btn-pwa-install').classList.add('hidden');
-    const mp = document.getElementById('btn-pwa-mob');
-    if (mp) mp.classList.add('hidden');
+    hideInstallUI();
+    showToast('✅ App installata!', 'success');
   });
 }
 

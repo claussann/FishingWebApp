@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f1923" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fishing Inv" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Fishing Inventory</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
@@ -102,6 +106,13 @@
           <p class="hero-sub">Gestisci attrezzatura, spot, uscite e statistiche tutto in un posto.</p>
         </div>
         <div class="hero-fish-deco">🐟</div>
+      </div>
+
+      <!-- Banner installa app — visibile solo su mobile quando PWA disponibile -->
+      <div id="install-banner" class="install-banner hidden">
+        <span>📲 Installa l'app sul tuo telefono!</span>
+        <button id="btn-install-banner" class="btn-install-banner">Installa</button>
+        <button id="btn-install-banner-close" class="btn-install-banner-close">✕</button>
       </div>
 
       <div class="home-grid">
