@@ -16,10 +16,10 @@
 /* ============================================================
    KEYS LOCALSTORAGE
    ============================================================ */
-const LS_ATT     = 'fi_attrezzatura';
-const LS_SPOT    = 'fi_spot';
-const LS_DIARIO  = 'fi_diario';
-const LS_THEME   = 'fi_theme';
+const LS_ATT = 'fi_attrezzatura';
+const LS_SPOT = 'fi_spot';
+const LS_DIARIO = 'fi_diario';
+const LS_THEME = 'fi_theme';
 const LS_CATTURE = 'fi_catture';
 
 /* ============================================================
@@ -69,35 +69,35 @@ const TECNICHE_PESCA = {
 
 /* Etichette leggibili per gli ambienti */
 const AMBIENTE_LABELS = {
-  mare:  '🌊 Mare',
+  mare: '🌊 Mare',
   barca: '⛵ Barca',
   dolce: '🏞️ Acqua Dolce',
 };
 
 /* Etichette leggibili per le categorie spot */
 const SPOT_CAT_LABELS = {
-  'spiaggia':    '🏖️ Spiaggia',
-  'scogliera':   '🪨 Scogliera',
-  'porto':       '⚓ Porto/Molo',
-  'diga':        '🚧 Diga/Frangiflutti',
+  'spiaggia': '🏖️ Spiaggia',
+  'scogliera': '🪨 Scogliera',
+  'porto': '⚓ Porto/Molo',
+  'diga': '🚧 Diga/Frangiflutti',
   'mare-aperto': '🌊 Mare Aperto',
-  'laguna':      '🐟 Laguna/Estuario',
-  'lago':        '🏞️ Lago',
-  'fiume':       '〰️ Fiume',
-  'torrente':    '💧 Torrente',
-  'canale':      '🌿 Canale',
+  'laguna': '🐟 Laguna/Estuario',
+  'lago': '🏞️ Lago',
+  'fiume': '〰️ Fiume',
+  'torrente': '💧 Torrente',
+  'canale': '🌿 Canale',
   'diga-invaso': '🏔️ Diga/Invaso',
 };
 
 /* ============================================================
    STATO GLOBALE
    ============================================================ */
-let map           = null;
+let map = null;
 let currentMarker = null;
 let currentLatLng = null;
-let spotMarkers   = [];
+let spotMarkers = [];
 let currentFilter = 'tutti';
-let statsYear     = new Date().getFullYear();
+let statsYear = new Date().getFullYear();
 let currentSection = 'home'; // traccia sezione attiva
 
 /* ============================================================
@@ -105,28 +105,28 @@ let currentSection = 'home'; // traccia sezione attiva
    ============================================================ */
 function lsGet(key) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : []; }
-  catch(e) { return []; }
+  catch (e) { return []; }
 }
 function lsSet(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function escHtml(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 function fmtDate(iso) {
   const d = new Date(iso);
-  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
-function fmtDay(iso)   { return new Date(iso).getDate(); }
-function fmtMonth(iso) { return new Date(iso).toLocaleDateString('it-IT',{month:'short'}).toUpperCase(); }
-function fmtYear(iso)  { return new Date(iso).getFullYear(); }
+function fmtDay(iso) { return new Date(iso).getDate(); }
+function fmtMonth(iso) { return new Date(iso).toLocaleDateString('it-IT', { month: 'short' }).toUpperCase(); }
+function fmtYear(iso) { return new Date(iso).getFullYear(); }
 
 /* ============================================================
    SPLASH SCREEN (5 secondi)
    ============================================================ */
 function initSplash() {
   const splash = document.getElementById('splash-screen');
-  const app    = document.getElementById('app');
+  const app = document.getElementById('app');
 
   // Funzione sicura per avviare l'app — cattura errori JS
   function launchApp() {
@@ -137,7 +137,7 @@ function initSplash() {
       app.classList.remove('hidden');
       try {
         initApp();
-      } catch(err) {
+      } catch (err) {
         console.error('Errore initApp:', err);
         // Mostra l'app comunque anche se qualcosa fallisce
         app.classList.remove('hidden');
@@ -153,7 +153,7 @@ function initSplash() {
       console.warn('Failsafe splash: forzata chiusura');
       splash.style.display = 'none';
       app.classList.remove('hidden');
-      try { initApp(); } catch(e) { console.error(e); }
+      try { initApp(); } catch (e) { console.error(e); }
     }
   }, 8000);
 }
@@ -224,9 +224,9 @@ function applyTheme(theme) {
 
   // Aggiorna icona bottoni
   const icon = isLight ? '☀️' : '🌙';
-  const btnTheme    = document.getElementById('btn-theme');
+  const btnTheme = document.getElementById('btn-theme');
   const btnThemeMob = document.getElementById('btn-theme-mob');
-  if (btnTheme)    btnTheme.textContent    = icon;
+  if (btnTheme) btnTheme.textContent = icon;
   if (btnThemeMob) btnThemeMob.textContent = `${icon} Cambia Tema`;
 }
 
@@ -263,6 +263,22 @@ function showSection(name) {
     updateStats();
     renderUltimaUscita();
   }
+  setTimeout(() => {
+    const activeSection = document.querySelector('.section.active');
+    if (!activeSection) return;
+
+    const ads = activeSection.querySelectorAll('ins.adsbygoogle');
+
+    ads.forEach(ad => {
+      if (!ad.getAttribute('data-adsbygoogle-status')) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          console.log('AdSense reload prevented');
+        }
+      }
+    });
+  }, 300);
 }
 
 function initNavbar() {
@@ -281,10 +297,10 @@ function initNavbar() {
 }
 
 function updateStats() {
-  const s = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  s('stat-att',     lsGet(LS_ATT).length);
-  s('stat-spot',    lsGet(LS_SPOT).length);
-  s('stat-uscite',  lsGet(LS_DIARIO).length);
+  const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  s('stat-att', lsGet(LS_ATT).length);
+  s('stat-spot', lsGet(LS_SPOT).length);
+  s('stat-uscite', lsGet(LS_DIARIO).length);
   s('stat-catture', lsGet(LS_CATTURE).length);
 }
 
@@ -292,20 +308,20 @@ function updateStats() {
    METEO — Open-Meteo + Nominatim
    ============================================================ */
 const WMO = {
-  0:{e:'☀️',d:'Sereno'},1:{e:'🌤️',d:'Quasi sereno'},2:{e:'⛅',d:'Parzialmente nuvoloso'},
-  3:{e:'☁️',d:'Coperto'},45:{e:'🌫️',d:'Nebbia'},48:{e:'🌫️',d:'Nebbia con brina'},
-  51:{e:'🌦️',d:'Pioggerella leggera'},53:{e:'🌦️',d:'Pioggerella'},55:{e:'🌧️',d:'Pioggerella forte'},
-  61:{e:'🌧️',d:'Pioggia leggera'},63:{e:'🌧️',d:'Pioggia'},65:{e:'🌧️',d:'Pioggia intensa'},
-  71:{e:'🌨️',d:'Neve leggera'},73:{e:'❄️',d:'Neve'},75:{e:'❄️',d:'Neve intensa'},
-  80:{e:'🌦️',d:'Rovesci'},81:{e:'🌧️',d:'Rovesci moderati'},82:{e:'⛈️',d:'Rovesci forti'},
-  95:{e:'⛈️',d:'Temporale'},96:{e:'⛈️',d:'Temporale con grandine'},99:{e:'⛈️',d:'Temporale forte'},
+  0: { e: '☀️', d: 'Sereno' }, 1: { e: '🌤️', d: 'Quasi sereno' }, 2: { e: '⛅', d: 'Parzialmente nuvoloso' },
+  3: { e: '☁️', d: 'Coperto' }, 45: { e: '🌫️', d: 'Nebbia' }, 48: { e: '🌫️', d: 'Nebbia con brina' },
+  51: { e: '🌦️', d: 'Pioggerella leggera' }, 53: { e: '🌦️', d: 'Pioggerella' }, 55: { e: '🌧️', d: 'Pioggerella forte' },
+  61: { e: '🌧️', d: 'Pioggia leggera' }, 63: { e: '🌧️', d: 'Pioggia' }, 65: { e: '🌧️', d: 'Pioggia intensa' },
+  71: { e: '🌨️', d: 'Neve leggera' }, 73: { e: '❄️', d: 'Neve' }, 75: { e: '❄️', d: 'Neve intensa' },
+  80: { e: '🌦️', d: 'Rovesci' }, 81: { e: '🌧️', d: 'Rovesci moderati' }, 82: { e: '⛈️', d: 'Rovesci forti' },
+  95: { e: '⛈️', d: 'Temporale' }, 96: { e: '⛈️', d: 'Temporale con grandine' }, 99: { e: '⛈️', d: 'Temporale forte' },
 };
 
 function initMeteo() {
   const btn = document.getElementById('btn-meteo');
   const inp = document.getElementById('meteo-city');
   if (btn) btn.addEventListener('click', searchMeteo);
-  if (inp) inp.addEventListener('keydown', e => { if(e.key==='Enter') searchMeteo(); });
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') searchMeteo(); });
 }
 
 async function searchMeteo() {
@@ -315,7 +331,7 @@ async function searchMeteo() {
   try {
     const geo = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`,
-      { headers:{'Accept-Language':'it'} }
+      { headers: { 'Accept-Language': 'it' } }
     ).then(r => r.json());
 
     if (!geo.length) { setMeteoState('error'); return; }
@@ -328,26 +344,26 @@ async function searchMeteo() {
 
     if (!m.current) { setMeteoState('error'); return; }
     const c = m.current;
-    const w = WMO[c.weathercode] || {e:'🌡️',d:'N/D'};
+    const w = WMO[c.weathercode] || { e: '🌡️', d: 'N/D' };
 
     document.getElementById('meteo-icon-display').textContent = w.e;
-    document.getElementById('meteo-temp').textContent         = `${Math.round(c.temperature_2m)}°C`;
-    document.getElementById('meteo-city-name').textContent    = cityName;
-    document.getElementById('meteo-desc').textContent         = w.d;
+    document.getElementById('meteo-temp').textContent = `${Math.round(c.temperature_2m)}°C`;
+    document.getElementById('meteo-city-name').textContent = cityName;
+    document.getElementById('meteo-desc').textContent = w.d;
     document.getElementById('meteo-extra').innerHTML = `
       <span class="meteo-chip">💨 ${c.wind_speed_10m} km/h</span>
       <span class="meteo-chip">💧 ${c.relative_humidity_2m}%</span>
     `;
     setMeteoState('result');
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     setMeteoState('error');
   }
 }
 
 function setMeteoState(state) {
-  ['loading','error','result'].forEach(s =>
-    document.getElementById('meteo-'+s).classList.toggle('hidden', s !== state));
+  ['loading', 'error', 'result'].forEach(s =>
+    document.getElementById('meteo-' + s).classList.toggle('hidden', s !== state));
 }
 
 /* ============================================================
@@ -355,7 +371,7 @@ function setMeteoState(state) {
    ============================================================ */
 function renderUltimaUscita() {
   const diario = lsGet(LS_DIARIO);
-  const el     = document.getElementById('ultima-uscita-content');
+  const el = document.getElementById('ultima-uscita-content');
   if (!el) return;
 
   if (!diario.length) {
@@ -364,7 +380,7 @@ function renderUltimaUscita() {
   }
 
   // Ordina per data decrescente
-  const sorted = [...diario].sort((a,b) => new Date(b.data) - new Date(a.data));
+  const sorted = [...diario].sort((a, b) => new Date(b.data) - new Date(a.data));
   const u = sorted[0];
 
   const spotNome = u.spotId
@@ -405,9 +421,9 @@ function initAttrezzaturaEvents() {
   document.getElementById('form-att').addEventListener('submit', saveAttrezzatura);
 
   // Cambio ambiente → aggiorna tecnica dinamicamente
-  document.getElementById('att-ambiente').addEventListener('change', function() {
-    const gruppo   = document.getElementById('att-tecnica-group');
-    const selTec   = document.getElementById('att-tecnica');
+  document.getElementById('att-ambiente').addEventListener('change', function () {
+    const gruppo = document.getElementById('att-tecnica-group');
+    const selTec = document.getElementById('att-tecnica');
     const ambiente = this.value;
 
     if (ambiente && TECNICHE_PESCA[ambiente]) {
@@ -444,13 +460,13 @@ function closeModalAtt() {
 
 function saveAttrezzatura(e) {
   e.preventDefault();
-  const tipo      = document.getElementById('att-tipo').value;
-  const nome      = document.getElementById('att-nome').value.trim();
+  const tipo = document.getElementById('att-tipo').value;
+  const nome = document.getElementById('att-nome').value.trim();
   const tipologia = document.getElementById('att-tipologia').value.trim();
-  const note      = document.getElementById('att-note').value.trim();
-  const ambiente  = document.getElementById('att-ambiente').value;
-  const tecnica   = document.getElementById('att-tecnica').value;
-  const quantita  = parseInt(document.getElementById('att-quantita').value) || 1;
+  const note = document.getElementById('att-note').value.trim();
+  const ambiente = document.getElementById('att-ambiente').value;
+  const tecnica = document.getElementById('att-tecnica').value;
+  const quantita = parseInt(document.getElementById('att-quantita').value) || 1;
 
   if (!tipo || !nome) {
     document.getElementById('form-att-error').classList.remove('hidden');
@@ -472,19 +488,19 @@ function saveAttrezzatura(e) {
 }
 
 function renderAttrezzatura() {
-  const lista    = lsGet(LS_ATT);
+  const lista = lsGet(LS_ATT);
   const filtered = currentFilter === 'tutti' ? lista : lista.filter(i => i.tipo === currentFilter);
   const container = document.getElementById('att-list');
-  const emptyEl   = document.getElementById('att-empty');
-  const countEl   = document.getElementById('sidebar-count');
+  const emptyEl = document.getElementById('att-empty');
+  const countEl = document.getElementById('sidebar-count');
 
   container.querySelectorAll('.att-item').forEach(el => el.remove());
-  if (countEl) countEl.textContent = `${filtered.length} element${filtered.length===1?'o':'i'}`;
+  if (countEl) countEl.textContent = `${filtered.length} element${filtered.length === 1 ? 'o' : 'i'}`;
 
-  if (!filtered.length) { emptyEl.style.display='block'; return; }
+  if (!filtered.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  const labels = {canna:'🎣 Canna', mulinello:'⚙️ Mulinello', minuteria:'🪝 Minuteria'};
+  const labels = { canna: '🎣 Canna', mulinello: '⚙️ Mulinello', minuteria: '🪝 Minuteria' };
 
   filtered.forEach(item => {
     const card = document.createElement('div');
@@ -504,7 +520,7 @@ function renderAttrezzatura() {
 
     card.innerHTML = `
       <div class="att-item-header">
-        <span class="att-tipo-badge badge-${item.tipo}">${labels[item.tipo]||item.tipo}</span>
+        <span class="att-tipo-badge badge-${item.tipo}">${labels[item.tipo] || item.tipo}</span>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           ${ambienteHtml}
           ${qtaHtml}
@@ -578,7 +594,7 @@ function initMap() {
 function loadExternalCSS(href) {
   if (document.querySelector(`link[href="${href}"]`)) return;
   const link = document.createElement('link');
-  link.rel  = 'stylesheet';
+  link.rel = 'stylesheet';
   link.href = href;
   document.head.appendChild(link);
 }
@@ -588,7 +604,7 @@ function loadLeaflet() {
     loadExternalCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.onload  = resolve;
+    script.onload = resolve;
     script.onerror = reject;
     document.head.appendChild(script);
   });
@@ -597,8 +613,8 @@ function loadLeaflet() {
 function buildMap() {
   map = L.map('map').setView([41.9, 12.5], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom:19
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
   }).addTo(map);
 
   if ('geolocation' in navigator) {
@@ -634,7 +650,7 @@ function makeIcon(emoji, color) {
     className: '',
     html: `<div style="background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.4)">
       <span style="transform:rotate(45deg);font-size:17px">${emoji}</span></div>`,
-    iconSize:[36,36], iconAnchor:[18,36], popupAnchor:[0,-38]
+    iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -38]
   });
 }
 
@@ -650,8 +666,8 @@ function openSpotModal() {
 
 function saveSpot(e) {
   e.preventDefault();
-  const nome      = document.getElementById('spot-nome').value.trim();
-  const note      = document.getElementById('spot-note').value.trim();
+  const nome = document.getElementById('spot-nome').value.trim();
+  const note = document.getElementById('spot-note').value.trim();
   const categoria = document.getElementById('spot-categoria').value;
   if (!nome) { document.getElementById('form-spot-error').classList.remove('hidden'); return; }
 
@@ -692,22 +708,22 @@ function addSpotMarker(spot) {
     <small style="color:#888">${fmtDate(spot.createdAt)}</small><br>
     <small style="color:#aaa;font-family:monospace">${spot.lat.toFixed(4)}, ${spot.lng.toFixed(4)}</small>
   </div>`);
-  spotMarkers.push({ id:spot.id, marker });
+  spotMarkers.push({ id: spot.id, marker });
 }
 
 function renderSpotMarkers() {
-  spotMarkers.forEach(({marker}) => map && map.removeLayer(marker));
+  spotMarkers.forEach(({ marker }) => map && map.removeLayer(marker));
   spotMarkers = [];
   lsGet(LS_SPOT).forEach(s => addSpotMarker(s));
 }
 
 function renderSpotList() {
-  const lista     = lsGet(LS_SPOT);
+  const lista = lsGet(LS_SPOT);
   const container = document.getElementById('spot-list');
-  const emptyEl   = document.getElementById('spot-empty');
+  const emptyEl = document.getElementById('spot-empty');
   container.querySelectorAll('.spot-item').forEach(el => el.remove());
 
-  if (!lista.length) { emptyEl.style.display='block'; return; }
+  if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
   lista.forEach(spot => {
@@ -736,7 +752,7 @@ function renderSpotList() {
         map.setView([spot.lat, spot.lng], 14);
         const found = spotMarkers.find(m => m.id === spot.id);
         if (found) found.marker.openPopup();
-        document.getElementById('map').scrollIntoView({ behavior:'smooth' });
+        document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
       }
     });
     card.querySelector('.btn-delete').addEventListener('click', () => deleteSpot(spot.id));
@@ -768,7 +784,7 @@ function initDiarioEvents() {
 
 function openModalUscita() {
   // Precompila data odierna
-  document.getElementById('uscita-data').value = new Date().toISOString().slice(0,10);
+  document.getElementById('uscita-data').value = new Date().toISOString().slice(0, 10);
 
   // Popola select spot
   const selSpot = document.getElementById('uscita-spot');
@@ -787,14 +803,14 @@ function openModalUscita() {
   if (!att.length) {
     checksDiv.innerHTML = '<p class="empty-inline">Nessuna attrezzatura salvata.</p>';
   } else {
-    const labels = {canna:'🎣',mulinello:'⚙️',minuteria:'🪝'};
+    const labels = { canna: '🎣', mulinello: '⚙️', minuteria: '🪝' };
     att.forEach(a => {
       const div = document.createElement('div');
       div.className = 'check-item';
       div.innerHTML = `
         <input type="checkbox" id="chk-${a.id}" value="${a.id}" />
         <label for="chk-${a.id}">
-          ${labels[a.tipo]||''} ${escHtml(a.nome)}
+          ${labels[a.tipo] || ''} ${escHtml(a.nome)}
           ${a.tipologia ? `<span class="check-label-badge"> · ${escHtml(a.tipologia)}</span>` : ''}
         </label>
       `;
@@ -816,17 +832,17 @@ function saveUscita(e) {
   const data = document.getElementById('uscita-data').value;
   if (!data) { document.getElementById('form-uscita-error').classList.remove('hidden'); return; }
 
-  const ora    = document.getElementById('uscita-ora').value;
+  const ora = document.getElementById('uscita-ora').value;
   const spotId = document.getElementById('uscita-spot').value;
-  const note   = document.getElementById('uscita-note').value.trim();
+  const note = document.getElementById('uscita-note').value.trim();
 
   // Raccogli attrezzatura selezionata
   const attIds = Array.from(
     document.querySelectorAll('#uscita-att-checks input[type="checkbox"]:checked')
   ).map(cb => cb.value);
 
-  const uscita = { id:genId(), data, ora, spotId, attIds, note, createdAt:new Date().toISOString() };
-  const lista  = lsGet(LS_DIARIO);
+  const uscita = { id: genId(), data, ora, spotId, attIds, note, createdAt: new Date().toISOString() };
+  const lista = lsGet(LS_DIARIO);
   lista.push(uscita);
   lsSet(LS_DIARIO, lista);
 
@@ -838,22 +854,22 @@ function saveUscita(e) {
 }
 
 function renderDiario() {
-  const lista     = lsGet(LS_DIARIO);
+  const lista = lsGet(LS_DIARIO);
   const container = document.getElementById('diario-list');
-  const emptyEl   = document.getElementById('diario-empty');
+  const emptyEl = document.getElementById('diario-empty');
   container.querySelectorAll('.uscita-card').forEach(el => el.remove());
 
-  if (!lista.length) { emptyEl.style.display='block'; return; }
+  if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
   // Ordina per data decrescente
-  const sorted = [...lista].sort((a,b) => new Date(b.data) - new Date(a.data));
-  const spots  = lsGet(LS_SPOT);
-  const atts   = lsGet(LS_ATT);
+  const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
+  const spots = lsGet(LS_SPOT);
+  const atts = lsGet(LS_ATT);
 
   sorted.forEach(u => {
     const spotNome = u.spotId ? (spots.find(s => s.id === u.spotId)?.nome) : null;
-    const attNomi  = (u.attIds||[]).map(id => atts.find(a => a.id === id)?.nome).filter(Boolean);
+    const attNomi = (u.attIds || []).map(id => atts.find(a => a.id === id)?.nome).filter(Boolean);
 
     const card = document.createElement('div');
     card.className = 'uscita-card';
@@ -894,7 +910,7 @@ function deleteUscita(id) {
 /* ============================================================
    STATISTICHE
    ============================================================ */
-const MESI = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+const MESI = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 
 function initStatisticheEvents() {
   document.getElementById('btn-year-prev').addEventListener('click', () => {
@@ -911,8 +927,8 @@ function initStatisticheEvents() {
 
 function renderStatistiche() {
   const diario = lsGet(LS_DIARIO);
-  const spots  = lsGet(LS_SPOT);
-  const atts   = lsGet(LS_ATT);
+  const spots = lsGet(LS_SPOT);
+  const atts = lsGet(LS_ATT);
 
   // --- Uscite per mese nell'anno selezionato ---
   const perMese = Array(12).fill(0);
@@ -928,18 +944,18 @@ function renderStatistiche() {
   drawChart(perMese, hasData);
 
   // --- Mini stat ---
-  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('ms-tot-uscite', diario.length);
 
-  const spotVisitati = new Set(diario.map(u=>u.spotId).filter(Boolean)).size;
+  const spotVisitati = new Set(diario.map(u => u.spotId).filter(Boolean)).size;
   set('ms-spot-unici', spotVisitati);
 
-  const attUsate = new Set(diario.flatMap(u=>u.attIds||[])).size;
+  const attUsate = new Set(diario.flatMap(u => u.attIds || [])).size;
   set('ms-att-usate', attUsate);
 
   // Mese top (anno corrente completo)
   const perMeseAll = Array(12).fill(0);
-  diario.forEach(u => { const d=new Date(u.data); perMeseAll[d.getMonth()]++; });
+  diario.forEach(u => { const d = new Date(u.data); perMeseAll[d.getMonth()]++; });
   const maxVal = Math.max(...perMeseAll);
   const meseTop = maxVal > 0 ? MESI[perMeseAll.indexOf(maxVal)] : '-';
   set('ms-mese-top', meseTop);
@@ -947,22 +963,22 @@ function renderStatistiche() {
   // --- Top spot ---
   const spotCount = {};
   diario.forEach(u => {
-    if (u.spotId) spotCount[u.spotId] = (spotCount[u.spotId]||0) + 1;
+    if (u.spotId) spotCount[u.spotId] = (spotCount[u.spotId] || 0) + 1;
   });
   const topSpots = Object.entries(spotCount)
-    .sort((a,b)=>b[1]-a[1]).slice(0,5)
-    .map(([id,cnt]) => ({ nome: spots.find(s=>s.id===id)?.nome||'Spot eliminato', cnt }));
+    .sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([id, cnt]) => ({ nome: spots.find(s => s.id === id)?.nome || 'Spot eliminato', cnt }));
 
   renderTopList('top-spot-list', topSpots, '📍', 'uscite');
 
   // --- Top attrezzatura ---
   const attCount = {};
-  diario.forEach(u => (u.attIds||[]).forEach(id => {
-    attCount[id] = (attCount[id]||0) + 1;
+  diario.forEach(u => (u.attIds || []).forEach(id => {
+    attCount[id] = (attCount[id] || 0) + 1;
   }));
   const topAtts = Object.entries(attCount)
-    .sort((a,b)=>b[1]-a[1]).slice(0,5)
-    .map(([id,cnt]) => ({ nome: atts.find(a=>a.id===id)?.nome||'Attrezz. eliminata', cnt }));
+    .sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([id, cnt]) => ({ nome: atts.find(a => a.id === id)?.nome || 'Attrezz. eliminata', cnt }));
 
   renderTopList('top-att-list', topAtts, '🎣', 'uscite');
 }
@@ -971,10 +987,10 @@ function renderTopList(containerId, items, emoji, suffix) {
   const el = document.getElementById(containerId);
   if (!el) return;
   if (!items.length) { el.innerHTML = '<p class="empty-inline">Nessun dato disponibile.</p>'; return; }
-  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
-  el.innerHTML = items.map((item,i) => `
+  const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+  el.innerHTML = items.map((item, i) => `
     <div class="top-item">
-      <span class="top-rank">${medals[i]||i+1}</span>
+      <span class="top-rank">${medals[i] || i + 1}</span>
       <span class="top-name">${emoji} ${escHtml(item.nome)}</span>
       <span class="top-count">${item.cnt} ${suffix}</span>
     </div>
@@ -994,21 +1010,21 @@ function drawChart(data, hasData) {
   // Dimensioni
   const W = canvas.parentElement.offsetWidth || 600;
   const H = 220;
-  canvas.width  = W;
+  canvas.width = W;
   canvas.height = H;
   ctx.clearRect(0, 0, W, H);
 
   if (!hasData) return;
 
-  const maxVal  = Math.max(...data, 1);
-  const padL    = 36;
-  const padR    = 16;
-  const padT    = 20;
-  const padB    = 40;
-  const barW    = Math.floor((W - padL - padR) / 12);
-  const barGap  = Math.floor(barW * 0.25);
+  const maxVal = Math.max(...data, 1);
+  const padL = 36;
+  const padR = 16;
+  const padT = 20;
+  const padB = 40;
+  const barW = Math.floor((W - padL - padR) / 12);
+  const barGap = Math.floor(barW * 0.25);
   const barActW = barW - barGap;
-  const chartH  = H - padT - padB;
+  const chartH = H - padT - padB;
 
   // Griglia orizzontale
   ctx.strokeStyle = 'rgba(255,255,255,0.07)';
@@ -1031,9 +1047,9 @@ function drawChart(data, hasData) {
   // Barre con gradiente
   data.forEach((val, i) => {
     if (val === 0) return;
-    const x   = padL + i * barW + Math.floor(barGap / 2);
-    const bH  = (val / maxVal) * chartH;
-    const y   = padT + chartH - bH;
+    const x = padL + i * barW + Math.floor(barGap / 2);
+    const bH = (val / maxVal) * chartH;
+    const y = padT + chartH - bH;
 
     const grad = ctx.createLinearGradient(0, y, 0, y + bH);
     grad.addColorStop(0, '#00C9A7');
@@ -1172,12 +1188,12 @@ function initBackup() {
 /** Costruisce l'oggetto backup completo */
 function buildBackup() {
   return {
-    exportDate:   new Date().toISOString(),
-    version:      '3.0',
+    exportDate: new Date().toISOString(),
+    version: '3.0',
     attrezzatura: lsGet(LS_ATT),
-    spot:         lsGet(LS_SPOT),
-    diario:       lsGet(LS_DIARIO),
-    catture:      lsGet(LS_CATTURE),
+    spot: lsGet(LS_SPOT),
+    diario: lsGet(LS_DIARIO),
+    catture: lsGet(LS_CATTURE),
   };
 }
 
@@ -1189,7 +1205,7 @@ function buildBackup() {
  */
 async function doSave(isAutosave = false) {
   const backup = buildBackup();
-  const json   = JSON.stringify(backup, null, 2);
+  const json = JSON.stringify(backup, null, 2);
   const filename = `fishing-inventory-backup-${new Date().toISOString().slice(0, 10)}.json`;
 
   // File System Access API (Chrome 86+, Edge 86+)
@@ -1220,9 +1236,9 @@ async function doSave(isAutosave = false) {
 
   // Fallback: download classico
   const blob = new Blob([json], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
@@ -1262,7 +1278,7 @@ function onAutosaveToggle() {
 
 function updateAutosaveLabel() {
   const label = document.getElementById('autosave-status-label');
-  const desc  = document.getElementById('autosave-desc');
+  const desc = document.getElementById('autosave-desc');
   if (!label) return;
   if (_autosaveEnabled) {
     label.textContent = '✅ Attivo';
@@ -1286,10 +1302,10 @@ function showImportPreview(data) {
     return;
   }
 
-  const att     = Array.isArray(data.attrezzatura) ? data.attrezzatura : [];
-  const spot    = Array.isArray(data.spot)         ? data.spot         : [];
-  const diario  = Array.isArray(data.diario)       ? data.diario       : [];
-  const catture = Array.isArray(data.catture)      ? data.catture      : [];
+  const att = Array.isArray(data.attrezzatura) ? data.attrezzatura : [];
+  const spot = Array.isArray(data.spot) ? data.spot : [];
+  const diario = Array.isArray(data.diario) ? data.diario : [];
+  const catture = Array.isArray(data.catture) ? data.catture : [];
 
   if (!att.length && !spot.length && !diario.length && !catture.length) {
     showImportError('Il file è vuoto o non contiene dati riconoscibili.');
@@ -1299,7 +1315,7 @@ function showImportPreview(data) {
   // Formatta data esportazione
   let exportDateStr = '–';
   if (data.exportDate) {
-    try { exportDateStr = fmtDate(data.exportDate); } catch(e) {}
+    try { exportDateStr = fmtDate(data.exportDate); } catch (e) { }
   }
 
   document.getElementById('import-preview').innerHTML = `
@@ -1339,9 +1355,9 @@ function confirmImport() {
   const { att, spot, diario, catture } = window._importData || {};
   if (!att && !spot && !diario && !catture) return;
 
-  lsSet(LS_ATT,     att     || []);
-  lsSet(LS_SPOT,    spot    || []);
-  lsSet(LS_DIARIO,  diario  || []);
+  lsSet(LS_ATT, att || []);
+  lsSet(LS_SPOT, spot || []);
+  lsSet(LS_DIARIO, diario || []);
   lsSet(LS_CATTURE, catture || []);
 
   closeModalImport();
@@ -1354,8 +1370,8 @@ function confirmImport() {
   triggerAutosave();
 
   if (currentSection === 'attrezzatura') renderAttrezzatura();
-  else if (currentSection === 'diario')     renderDiario();
-  else if (currentSection === 'catture')    renderCatture();
+  else if (currentSection === 'diario') renderDiario();
+  else if (currentSection === 'catture') renderCatture();
   else if (currentSection === 'statistiche') renderStatistiche();
   else if (currentSection === 'spot') {
     renderSpotList();
@@ -1448,7 +1464,7 @@ function initFotoInput(inputId, imgId, previewId, globalKey) {
         let w = img.width, h = img.height;
         if (w > MAX || h > MAX) {
           if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else       { w = Math.round(w * MAX / h); h = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
         }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
@@ -1478,7 +1494,7 @@ function resetFoto(inputId, imgId, previewId, globalKey) {
 /** Apre modale fullscreen per una foto base64 */
 function openFotoFullscreen(id, type) {
   let lista, item;
-  if (type === 'spot')    lista = lsGet(LS_SPOT);
+  if (type === 'spot') lista = lsGet(LS_SPOT);
   if (type === 'cattura') lista = lsGet(LS_CATTURE);
   item = lista.find(x => x.id === id);
   if (!item || !item.foto) return;
@@ -1517,11 +1533,11 @@ function closeModalCattura() {
 
 function saveCattura(e) {
   e.preventDefault();
-  const data    = document.getElementById('cattura-data').value;
-  const specie  = document.getElementById('cattura-specie').value.trim();
-  const peso    = document.getElementById('cattura-peso').value;
-  const note    = document.getElementById('cattura-note').value.trim();
-  const foto    = window._catFotoBase64 || null;
+  const data = document.getElementById('cattura-data').value;
+  const specie = document.getElementById('cattura-specie').value.trim();
+  const peso = document.getElementById('cattura-peso').value;
+  const note = document.getElementById('cattura-note').value.trim();
+  const foto = window._catFotoBase64 || null;
 
   if (!data || !specie) {
     document.getElementById('form-cattura-error').classList.remove('hidden');
@@ -1540,9 +1556,9 @@ function saveCattura(e) {
 }
 
 function renderCatture() {
-  const lista     = lsGet(LS_CATTURE);
+  const lista = lsGet(LS_CATTURE);
   const container = document.getElementById('catture-list');
-  const emptyEl   = document.getElementById('catture-empty');
+  const emptyEl = document.getElementById('catture-empty');
   container.querySelectorAll('.cattura-card, .ad-banner-catture').forEach(el => el.remove());
 
   if (!lista.length) { emptyEl.style.display = 'block'; return; }
@@ -1611,9 +1627,9 @@ function initPWA() {
   let deferredPrompt = null;
 
   const btnDesktop = document.getElementById('btn-pwa-install');
-  const btnMob     = document.getElementById('btn-pwa-mob');
-  const banner     = document.getElementById('install-banner');
-  const btnBanner  = document.getElementById('btn-install-banner');
+  const btnMob = document.getElementById('btn-pwa-mob');
+  const banner = document.getElementById('install-banner');
+  const btnBanner = document.getElementById('btn-install-banner');
   const btnBannerX = document.getElementById('btn-install-banner-close');
 
   // Se già aperta come app standalone non mostrare nulla
@@ -1621,14 +1637,14 @@ function initPWA() {
 
   function showInstallUI() {
     if (btnDesktop) btnDesktop.classList.remove('hidden');
-    if (btnMob)     btnMob.classList.remove('hidden');
-    if (banner)     banner.classList.remove('hidden');
+    if (btnMob) btnMob.classList.remove('hidden');
+    if (banner) banner.classList.remove('hidden');
   }
 
   function hideInstallUI() {
     if (btnDesktop) btnDesktop.classList.add('hidden');
-    if (btnMob)     btnMob.classList.add('hidden');
-    if (banner)     banner.classList.add('hidden');
+    if (btnMob) btnMob.classList.add('hidden');
+    if (banner) banner.classList.add('hidden');
   }
 
   async function doInstall() {
@@ -1652,7 +1668,7 @@ function initPWA() {
     const autoPrompt = () => {
       if (deferredPrompt) doInstall();
     };
-    document.addEventListener('click',      autoPrompt, { once: true });
+    document.addEventListener('click', autoPrompt, { once: true });
     document.addEventListener('touchstart', autoPrompt, { once: true });
   });
 
@@ -1663,7 +1679,7 @@ function initPWA() {
     doInstall();
   });
 
-  if (btnBanner)  btnBanner.addEventListener('click', doInstall);
+  if (btnBanner) btnBanner.addEventListener('click', doInstall);
   if (btnBannerX) btnBannerX.addEventListener('click', () => {
     if (banner) banner.classList.add('hidden');
   });
