@@ -165,8 +165,17 @@ function initApp() {
   // Registra Service Worker per PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW registrato:', reg.scope))
+      .then(reg => {
+        console.log('SW registrato:', reg.scope);
+      })
       .catch(err => console.warn('SW non registrato:', err));
+
+    // Ascolta messaggi dal Service Worker (es. aggiornamento disponibile)
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'SW_UPDATED') {
+        showToast('🔄 App aggiornata! Riavvia per le ultime novità.', 'success');
+      }
+    });
   }
 
   // Carica Google Fonts in modo non bloccante
@@ -1600,7 +1609,6 @@ function deleteCattura(id) {
    ============================================================ */
 function initPWA() {
   let deferredPrompt = null;
-  let prompted = false;
 
   const btnDesktop = document.getElementById('btn-pwa-install');
   const btnMob     = document.getElementById('btn-pwa-mob');
@@ -1608,7 +1616,7 @@ function initPWA() {
   const btnBanner  = document.getElementById('btn-install-banner');
   const btnBannerX = document.getElementById('btn-install-banner-close');
 
-  // Se già installata come PWA non mostrare nulla
+  // Se già aperta come app standalone non mostrare nulla
   if (window.matchMedia('(display-mode: standalone)').matches) return;
 
   function showInstallUI() {
@@ -1628,48 +1636,36 @@ function initPWA() {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     deferredPrompt = null;
-    prompted = true;
     if (outcome === 'accepted') {
       hideInstallUI();
       showToast('✅ App installata con successo!', 'success');
     }
   }
 
-  // Cattura il prompt
+  // Chrome cattura qui il prompt — mostra subito l'UI di installazione
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
     showInstallUI();
 
-    // Mostra il prompt automaticamente al primo tocco/click sull'app
-    // dopo 2 secondi dalla splash (una volta sola per sessione)
-    if (!prompted && !sessionStorage.getItem('pwa_prompted')) {
-      const autoPrompt = () => {
-        if (deferredPrompt && !prompted) {
-          prompted = true;
-          sessionStorage.setItem('pwa_prompted', '1');
-          doInstall();
-        }
-        document.removeEventListener('click', autoPrompt);
-        document.removeEventListener('touchstart', autoPrompt);
-      };
-      // Aspetta che l'utente interagisca per la prima volta
-      document.addEventListener('click', autoPrompt, { once: true });
-      document.addEventListener('touchstart', autoPrompt, { once: true });
-    }
+    // Lancia il prompt al primo tocco dell'utente (una volta sola)
+    const autoPrompt = () => {
+      if (deferredPrompt) doInstall();
+    };
+    document.addEventListener('click',      autoPrompt, { once: true });
+    document.addEventListener('touchstart', autoPrompt, { once: true });
   });
 
-  // Click sui vari bottoni
   if (btnDesktop) btnDesktop.addEventListener('click', doInstall);
+
   if (btnMob) btnMob.addEventListener('click', () => {
     document.getElementById('mobile-nav').classList.add('hidden');
     doInstall();
   });
+
   if (btnBanner)  btnBanner.addEventListener('click', doInstall);
   if (btnBannerX) btnBannerX.addEventListener('click', () => {
     if (banner) banner.classList.add('hidden');
-    // Rimuovi anche l'auto-prompt se l'utente chiude il banner
-    sessionStorage.setItem('pwa_prompted', '1');
   });
 
   window.addEventListener('appinstalled', () => {
