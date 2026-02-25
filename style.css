@@ -43,7 +43,7 @@ body {
   font-family: var(--font-body);
   background: var(--c-bg);
   color: var(--c-white);
-  min-height: 100dvh;
+  min-height: 100vh;
   overflow-x: hidden;
 }
 button { cursor: pointer; font-family: var(--font-body); }
@@ -55,7 +55,7 @@ input, select, textarea { font-family: var(--font-body); }
    ============================================================ */
 #splash-screen {
   position: fixed; inset: 0; z-index: 9999;
-  height: 100dvh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #0f1923 0%, #0d2d3a 50%, #0f2233 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
@@ -182,7 +182,7 @@ input, select, textarea { font-family: var(--font-body); }
   padding: 12px 16px;
   display: flex; flex-direction: column; gap: 6px;
   animation: slideDown 0.2s ease;
-  max-height: calc(100dvh - var(--header-h));
+  min-height: 100vh;
   overflow-y: auto;
 }
 @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
@@ -214,9 +214,10 @@ input, select, textarea { font-family: var(--font-body); }
 /* ============================================================
    APP / SEZIONI
    ============================================================ */
-#app { padding-top: var(--header-h); min-height: 100dvh; }
+#app { padding-top: var(--header-h); 
+      min-height: 100vh; }
 .section {
-  min-height: calc(100dvh - var(--header-h));
+  min-height: calc(100vh - var(--header-h));
   padding: 36px 24px 64px;
   animation: sectionIn 0.35s ease both;
 }
@@ -984,8 +985,7 @@ body.light .splash-loader-bar { background: rgba(15,30,48,0.15); }
     display: block;
   }
   /* Padding body per non coprire contenuto con anchor */
-  body { padding-bottom: 60px;
-       min-height: 100vh}
+  body { padding-bottom: 60px;}
   /* Firma sopra anchor */
   .firma-fixed { bottom: 70px; }
 }
