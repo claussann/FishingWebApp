@@ -25,6 +25,7 @@
   --c-white08:   rgba(255,255,255,0.08);
   --c-white04:   rgba(255,255,255,0.04);
 
+  --anchor-h: 60px;
   --card-bg:     rgba(255,255,255,0.07);
   --card-border: rgba(255,255,255,0.13);
   --shadow:      0 12px 40px rgba(0,0,0,0.5);
@@ -42,7 +43,7 @@ body {
   font-family: var(--font-body);
   background: var(--c-bg);
   color: var(--c-white);
-  min-height: 100dvh;;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 button { cursor: pointer; font-family: var(--font-body); }
@@ -212,7 +213,7 @@ input, select, textarea { font-family: var(--font-body); }
 /* ============================================================
    APP / SEZIONI
    ============================================================ */
-#app { padding-top: var(--header-h); min-height: 100dvh;; }
+#app { padding-top: var(--header-h); min-height: 100dvh; }
 .section {
   min-height: calc(100dvh - var(--header-h));
   padding: 36px 24px 64px;
