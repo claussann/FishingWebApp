@@ -55,6 +55,7 @@ input, select, textarea { font-family: var(--font-body); }
    ============================================================ */
 #splash-screen {
   position: fixed; inset: 0; z-index: 9999;
+  height: 100dvh;
   background: linear-gradient(135deg, #0f1923 0%, #0d2d3a 50%, #0f2233 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
@@ -983,7 +984,8 @@ body.light .splash-loader-bar { background: rgba(15,30,48,0.15); }
     display: block;
   }
   /* Padding body per non coprire contenuto con anchor */
-  body { padding-bottom: 60px; }
+  body { padding-bottom: 60px;
+       min-height: 100dvh}
   /* Firma sopra anchor */
   .firma-fixed { bottom: 70px; }
 }
