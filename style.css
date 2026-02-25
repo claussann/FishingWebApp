@@ -985,7 +985,7 @@ body.light .splash-loader-bar { background: rgba(15,30,48,0.15); }
   }
   /* Padding body per non coprire contenuto con anchor */
   body { padding-bottom: 60px;
-       min-height: 100dvh}
+       min-height: 100vh}
   /* Firma sopra anchor */
   .firma-fixed { bottom: 70px; }
 }
