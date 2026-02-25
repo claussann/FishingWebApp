@@ -38,13 +38,13 @@
   "screenshots": [
     {
       "src": "/screenshot-mobile.png",
-      "sizes": "780×1688",
+      "sizes": "780x1688",
       "type": "image/png",
       "label": "Fishing Inventory — Home"
     },
     {
       "src": "/screenshot-desktop.png",
-      "sizes": "1280x800",
+      "sizes": "2560x1600",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Fishing Inventory — Desktop"
