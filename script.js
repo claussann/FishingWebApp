@@ -122,13 +122,31 @@ function fmtMonth(iso) { return new Date(iso).toLocaleDateString('it-IT', { mont
 function fmtYear(iso) { return new Date(iso).getFullYear(); }
 
 /* ============================================================
+   ADSENSE — helper centralizzato
+   Inizializza un blocco <ins> solo quando è visibile (width > 0).
+   Usa data-adsbygoogle-status per evitare doppi push().
+   ============================================================ */
+function initAd(insId) {
+  const el = document.getElementById(insId);
+  if (!el) return;
+  // Se AdSense ha già processato questo slot (anche con errore) non riprovare
+  if (el.getAttribute('data-adsbygoogle-status')) return;
+  // Controllo aggiuntivo: il contenitore deve avere larghezza > 0
+  if (el.offsetWidth === 0) return;
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {
+    console.warn('AdSense initAd error:', insId, e);
+  }
+}
+
+/* ============================================================
    SPLASH SCREEN (5 secondi)
    ============================================================ */
 function initSplash() {
   const splash = document.getElementById('splash-screen');
   const app = document.getElementById('app');
 
-  // Funzione sicura per avviare l'app — cattura errori JS
   function launchApp() {
     splash.style.transition = 'opacity 0.7s ease';
     splash.style.opacity = '0';
@@ -139,21 +157,29 @@ function initSplash() {
         initApp();
       } catch (err) {
         console.error('Errore initApp:', err);
-        // Mostra l'app comunque anche se qualcosa fallisce
         app.classList.remove('hidden');
       }
+
+      // ── ADSENSE: inizializza Home e Anchor DOPO che #app è visibile ──
+      // Il delay garantisce che il browser abbia calcolato le larghezze
+      setTimeout(() => {
+        initAd('ad-home');
+        initAd('ad-anchor');
+      }, 500);
+
     }, 700);
   }
 
   setTimeout(launchApp, 5000);
 
-  // Failsafe: se dopo 8 secondi lo splash è ancora visibile, forza la chiusura
+  // Failsafe: forza chiusura splash dopo 8s
   setTimeout(() => {
     if (splash.style.display !== 'none') {
       console.warn('Failsafe splash: forzata chiusura');
       splash.style.display = 'none';
       app.classList.remove('hidden');
       try { initApp(); } catch (e) { console.error(e); }
+      setTimeout(() => { initAd('ad-home'); initAd('ad-anchor'); }, 500);
     }
   }, 8000);
 }
@@ -170,7 +196,6 @@ function initApp() {
       })
       .catch(err => console.warn('SW non registrato:', err));
 
-    // Ascolta messaggi dal Service Worker (es. aggiornamento disponibile)
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data?.type === 'SW_UPDATED') {
         showToast('🔄 App aggiornata! Riavvia per le ultime novità.', 'success');
@@ -202,9 +227,7 @@ function initTheme() {
   const saved = localStorage.getItem(LS_THEME) || 'dark';
   applyTheme(saved);
 
-  // Bottone desktop
   document.getElementById('btn-theme').addEventListener('click', toggleTheme);
-  // Bottone mobile
   const mobTheme = document.getElementById('btn-theme-mob');
   if (mobTheme) mobTheme.addEventListener('click', () => {
     toggleTheme();
@@ -222,7 +245,6 @@ function applyTheme(theme) {
   document.body.classList.toggle('light', isLight);
   localStorage.setItem(LS_THEME, theme);
 
-  // Aggiorna icona bottoni
   const icon = isLight ? '☀️' : '🌙';
   const btnTheme = document.getElementById('btn-theme');
   const btnThemeMob = document.getElementById('btn-theme-mob');
@@ -230,10 +252,11 @@ function applyTheme(theme) {
   if (btnThemeMob) btnThemeMob.textContent = `${icon} Cambia Tema`;
 }
 
-
+/* ============================================================
+   NAVIGAZIONE TRA SEZIONI
+   ============================================================ */
 function showSection(name) {
   currentSection = name;
-  // Chiudi mobile nav se aperto
   document.getElementById('mobile-nav').classList.add('hidden');
 
   document.querySelectorAll('.nav-btn[data-section]').forEach(b =>
@@ -263,35 +286,31 @@ function showSection(name) {
     updateStats();
     renderUltimaUscita();
   }
-  setTimeout(() => {
-    const activeSection = document.querySelector('.section.active');
-    if (!activeSection) return;
 
-    const ads = activeSection.querySelectorAll('ins.adsbygoogle');
-
-    ads.forEach(ad => {
-      if (!ad.getAttribute('data-adsbygoogle-status')) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-          console.log('AdSense reload prevented');
-        }
-      }
-    });
-  }, 300);
+  // ── ADSENSE: mappa sezione → id del blocco ins corrispondente ──
+  const adMap = {
+    home:         'ad-home',
+    attrezzatura: 'ad-attrezzatura',
+    spot:         'ad-spot',
+    diario:       'ad-diario',
+    statistiche:  'ad-statistiche',
+    catture:      'ad-catture',
+  };
+  if (adMap[name]) {
+    // Delay 300ms: il browser deve prima rendere la sezione visibile
+    // e calcolare le dimensioni dei contenitori
+    setTimeout(() => initAd(adMap[name]), 300);
+  }
 }
 
 function initNavbar() {
-  // Desktop nav
   document.querySelectorAll('.nav-btn[data-section]').forEach(b =>
     b.addEventListener('click', () => showSection(b.dataset.section)));
 
-  // Hamburger mobile
   document.getElementById('hamburger').addEventListener('click', () => {
     document.getElementById('mobile-nav').classList.toggle('hidden');
   });
 
-  // Mobile nav buttons
   document.querySelectorAll('.mob-btn[data-section]').forEach(b =>
     b.addEventListener('click', () => showSection(b.dataset.section)));
 }
@@ -379,7 +398,6 @@ function renderUltimaUscita() {
     return;
   }
 
-  // Ordina per data decrescente
   const sorted = [...diario].sort((a, b) => new Date(b.data) - new Date(a.data));
   const u = sorted[0];
 
@@ -420,7 +438,6 @@ function initAttrezzaturaEvents() {
   });
   document.getElementById('form-att').addEventListener('submit', saveAttrezzatura);
 
-  // Cambio ambiente → aggiorna tecnica dinamicamente
   document.getElementById('att-ambiente').addEventListener('change', function () {
     const gruppo = document.getElementById('att-tecnica-group');
     const selTec = document.getElementById('att-tecnica');
@@ -507,7 +524,6 @@ function renderAttrezzatura() {
     card.className = 'att-item';
     card.dataset.tipo = item.tipo;
 
-    // Riga badge superiore: tipo + quantità + ambiente
     const ambienteHtml = item.ambiente
       ? `<span class="att-ambiente-badge">${AMBIENTE_LABELS[item.ambiente] || item.ambiente}</span>`
       : '';
@@ -566,16 +582,18 @@ function initSpotEvents() {
   });
 }
 
+/* ── closeModalSpot — unica definizione corretta ── */
 function closeModalSpot() {
   document.getElementById('modal-spot').classList.add('hidden');
   document.getElementById('form-spot').reset();
   document.getElementById('form-spot-error').classList.add('hidden');
-  resetFoto('spot-foto-input', 'spot-foto-img', 'spot-foto-preview', '_spotFotoBase64');
+  // Reset foto
+  window._spotFotoBase64 = null;
+  document.getElementById('spot-foto-preview').classList.add('hidden');
+  document.getElementById('spot-foto-img').src = '';
 }
 
-
 function initMap() {
-  // Carica Leaflet dinamicamente solo quando serve la mappa
   if (typeof L === 'undefined') {
     loadLeaflet()
       .then(() => buildMap())
@@ -689,16 +707,6 @@ function saveSpot(e) {
   triggerAutosave();
 }
 
-function closeModalSpot() {
-  document.getElementById('modal-spot').classList.add('hidden');
-  document.getElementById('form-spot').reset();
-  document.getElementById('form-spot-error').classList.add('hidden');
-  // Reset foto
-  window._spotFotoBase64 = null;
-  document.getElementById('spot-foto-preview').classList.add('hidden');
-  document.getElementById('spot-foto-img').src = '';
-}
-
 function addSpotMarker(spot) {
   if (!map) return;
   const marker = L.marker([spot.lat, spot.lng], { icon: makeIcon('🎣', '#FFD166') }).addTo(map);
@@ -783,10 +791,8 @@ function initDiarioEvents() {
 }
 
 function openModalUscita() {
-  // Precompila data odierna
   document.getElementById('uscita-data').value = new Date().toISOString().slice(0, 10);
 
-  // Popola select spot
   const selSpot = document.getElementById('uscita-spot');
   selSpot.innerHTML = '<option value="">-- Nessuno / Non salvato --</option>';
   lsGet(LS_SPOT).forEach(s => {
@@ -796,7 +802,6 @@ function openModalUscita() {
     selSpot.appendChild(opt);
   });
 
-  // Popola checkbox attrezzatura
   const checksDiv = document.getElementById('uscita-att-checks');
   checksDiv.innerHTML = '';
   const att = lsGet(LS_ATT);
@@ -836,7 +841,6 @@ function saveUscita(e) {
   const spotId = document.getElementById('uscita-spot').value;
   const note = document.getElementById('uscita-note').value.trim();
 
-  // Raccogli attrezzatura selezionata
   const attIds = Array.from(
     document.querySelectorAll('#uscita-att-checks input[type="checkbox"]:checked')
   ).map(cb => cb.value);
@@ -862,7 +866,6 @@ function renderDiario() {
   if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  // Ordina per data decrescente
   const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
   const spots = lsGet(LS_SPOT);
   const atts = lsGet(LS_ATT);
@@ -930,7 +933,6 @@ function renderStatistiche() {
   const spots = lsGet(LS_SPOT);
   const atts = lsGet(LS_ATT);
 
-  // --- Uscite per mese nell'anno selezionato ---
   const perMese = Array(12).fill(0);
   diario.forEach(u => {
     const d = new Date(u.data);
@@ -940,10 +942,8 @@ function renderStatistiche() {
   const hasData = perMese.some(v => v > 0);
   document.getElementById('chart-empty').classList.toggle('hidden', hasData);
 
-  // Disegna grafico canvas
   drawChart(perMese, hasData);
 
-  // --- Mini stat ---
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('ms-tot-uscite', diario.length);
 
@@ -953,14 +953,12 @@ function renderStatistiche() {
   const attUsate = new Set(diario.flatMap(u => u.attIds || [])).size;
   set('ms-att-usate', attUsate);
 
-  // Mese top (anno corrente completo)
   const perMeseAll = Array(12).fill(0);
   diario.forEach(u => { const d = new Date(u.data); perMeseAll[d.getMonth()]++; });
   const maxVal = Math.max(...perMeseAll);
   const meseTop = maxVal > 0 ? MESI[perMeseAll.indexOf(maxVal)] : '-';
   set('ms-mese-top', meseTop);
 
-  // --- Top spot ---
   const spotCount = {};
   diario.forEach(u => {
     if (u.spotId) spotCount[u.spotId] = (spotCount[u.spotId] || 0) + 1;
@@ -971,7 +969,6 @@ function renderStatistiche() {
 
   renderTopList('top-spot-list', topSpots, '📍', 'uscite');
 
-  // --- Top attrezzatura ---
   const attCount = {};
   diario.forEach(u => (u.attIds || []).forEach(id => {
     attCount[id] = (attCount[id] || 0) + 1;
@@ -1000,14 +997,11 @@ function renderTopList(containerId, items, emoji, suffix) {
 /* ============================================================
    GRAFICO CANVAS — Uscite per Mese
    ============================================================ */
-let chartInstance = null; // riferimento per distruggere prima di ridisegnare
-
 function drawChart(data, hasData) {
   const canvas = document.getElementById('chart-uscite');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // Dimensioni
   const W = canvas.parentElement.offsetWidth || 600;
   const H = 220;
   canvas.width = W;
@@ -1026,7 +1020,6 @@ function drawChart(data, hasData) {
   const barActW = barW - barGap;
   const chartH = H - padT - padB;
 
-  // Griglia orizzontale
   ctx.strokeStyle = 'rgba(255,255,255,0.07)';
   ctx.lineWidth = 1;
   const steps = 4;
@@ -1036,7 +1029,6 @@ function drawChart(data, hasData) {
     ctx.moveTo(padL, y);
     ctx.lineTo(W - padR, y);
     ctx.stroke();
-    // Label valori
     const val = Math.round((maxVal / steps) * i);
     ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.font = '11px Nunito, sans-serif';
@@ -1044,7 +1036,6 @@ function drawChart(data, hasData) {
     ctx.fillText(val, padL - 4, y + 4);
   }
 
-  // Barre con gradiente
   data.forEach((val, i) => {
     if (val === 0) return;
     const x = padL + i * barW + Math.floor(barGap / 2);
@@ -1056,18 +1047,15 @@ function drawChart(data, hasData) {
     grad.addColorStop(1, '#4E8CF6');
     ctx.fillStyle = grad;
 
-    // Barra con angoli arrotondati in alto
     roundRect(ctx, x, y, barActW, bH, 5);
     ctx.fill();
 
-    // Valore sopra la barra
     ctx.fillStyle = '#00C9A7';
     ctx.font = 'bold 11px Nunito, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(val, x + barActW / 2, y - 6);
   });
 
-  // Etichette mesi
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.font = '11px Nunito, sans-serif';
   ctx.textAlign = 'center';
@@ -1077,7 +1065,6 @@ function drawChart(data, hasData) {
   });
 }
 
-/** Disegna un rettangolo con angoli superiori arrotondati */
 function roundRect(ctx, x, y, w, h, r) {
   if (h < r) r = h;
   ctx.beginPath();
@@ -1094,14 +1081,11 @@ function roundRect(ctx, x, y, w, h, r) {
 /* ============================================================
    BACKUP — SALVA / CARICA + AUTOSAVE
    ============================================================ */
-
-// Handle per il File System Access API (sostituzione file)
 let _fsaFileHandle = null;
 let _autosaveEnabled = false;
 const LS_AUTOSAVE = 'fi_autosave';
 
 function initBackup() {
-  // Ripristina stato autosave
   _autosaveEnabled = localStorage.getItem(LS_AUTOSAVE) === 'true';
   const toggle = document.getElementById('autosave-toggle');
   if (toggle) {
@@ -1110,7 +1094,6 @@ function initBackup() {
     toggle.addEventListener('change', onAutosaveToggle);
   }
 
-  // ---- SALVA: mostra popup info prima di scaricare ----
   const openSalvaInfo = () => {
     document.getElementById('mobile-nav').classList.add('hidden');
     document.getElementById('modal-salva-info').classList.remove('hidden');
@@ -1119,7 +1102,6 @@ function initBackup() {
   const mobBackup = document.getElementById('btn-backup-mob');
   if (mobBackup) mobBackup.addEventListener('click', openSalvaInfo);
 
-  // Chiudi modale salva info
   document.getElementById('modal-salva-info-close').addEventListener('click', () => {
     document.getElementById('modal-salva-info').classList.add('hidden');
   });
@@ -1128,13 +1110,11 @@ function initBackup() {
       document.getElementById('modal-salva-info').classList.add('hidden');
   });
 
-  // Bottone "Salva ora" dentro il popup
   document.getElementById('btn-salva-confirm').addEventListener('click', () => {
     document.getElementById('modal-salva-info').classList.add('hidden');
     doSave();
   });
 
-  // ---- CARICA: mostra popup info prima di aprire file picker ----
   const openCaricaInfo = () => {
     document.getElementById('mobile-nav').classList.add('hidden');
     document.getElementById('modal-carica-info').classList.remove('hidden');
@@ -1143,7 +1123,6 @@ function initBackup() {
   const mobImport = document.getElementById('btn-import-mob');
   if (mobImport) mobImport.addEventListener('click', openCaricaInfo);
 
-  // Chiudi modale carica info
   document.getElementById('modal-carica-info-close').addEventListener('click', () => {
     document.getElementById('modal-carica-info').classList.add('hidden');
   });
@@ -1152,14 +1131,12 @@ function initBackup() {
       document.getElementById('modal-carica-info').classList.add('hidden');
   });
 
-  // Bottone "Scegli file" dentro il popup carica
   document.getElementById('btn-carica-confirm').addEventListener('click', () => {
     document.getElementById('modal-carica-info').classList.add('hidden');
     fileInput.value = '';
     fileInput.click();
   });
 
-  // ---- FILE INPUT per importazione ----
   const fileInput = document.getElementById('import-file-input');
   fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
@@ -1177,7 +1154,6 @@ function initBackup() {
     reader.readAsText(file);
   });
 
-  // Chiudi modale importazione
   document.getElementById('modal-import-close').addEventListener('click', closeModalImport);
   document.getElementById('btn-import-cancel').addEventListener('click', closeModalImport);
   document.getElementById('modal-import').addEventListener('click', e => {
@@ -1185,7 +1161,6 @@ function initBackup() {
   });
 }
 
-/** Costruisce l'oggetto backup completo */
 function buildBackup() {
   return {
     exportDate: new Date().toISOString(),
@@ -1197,22 +1172,14 @@ function buildBackup() {
   };
 }
 
-/**
- * Salva il backup:
- * 1. Se File System Access API disponibile e handle esistente → sovrascrive
- * 2. Se FSA disponibile ma nessun handle → chiede dove salvare
- * 3. Fallback → download classico
- */
 async function doSave(isAutosave = false) {
   const backup = buildBackup();
   const json = JSON.stringify(backup, null, 2);
   const filename = `fishing-inventory-backup-${new Date().toISOString().slice(0, 10)}.json`;
 
-  // File System Access API (Chrome 86+, Edge 86+)
   if ('showSaveFilePicker' in window) {
     try {
       if (!_fsaFileHandle || !isAutosave) {
-        // Prima volta o salvataggio manuale: apri dialog
         _fsaFileHandle = await window.showSaveFilePicker({
           suggestedName: filename,
           types: [{ description: 'JSON Backup', accept: { 'application/json': ['.json'] } }],
@@ -1228,13 +1195,11 @@ async function doSave(isAutosave = false) {
       }
       return;
     } catch (err) {
-      if (err.name === 'AbortError') return; // utente ha annullato
-      // Fallback se errore FSA
+      if (err.name === 'AbortError') return;
       _fsaFileHandle = null;
     }
   }
 
-  // Fallback: download classico
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1247,10 +1212,8 @@ async function doSave(isAutosave = false) {
   if (!isAutosave) showToast('✅ File salvato nella cartella Download!', 'success');
 }
 
-/** Chiamato dopo ogni modifica ai dati per il salvataggio automatico */
 function triggerAutosave() {
   if (!_autosaveEnabled) return;
-  // Debounce: salva dopo 1 secondo dall'ultima modifica
   clearTimeout(window._autosaveTimer);
   window._autosaveTimer = setTimeout(() => doSave(true), 1000);
 }
@@ -1261,12 +1224,10 @@ function onAutosaveToggle() {
   updateAutosaveLabel();
 
   if (_autosaveEnabled) {
-    // Se FSA non disponibile, avvisa
     if (!('showSaveFilePicker' in window)) {
       showToast('⚠️ Autosave: il tuo browser userà Download standard', 'error');
     } else {
       showToast('✅ Salvataggio automatico attivato!', 'success');
-      // Prima attivazione: chiedi subito dove salvare
       if (!_fsaFileHandle) doSave(false);
     }
   } else {
@@ -1291,9 +1252,7 @@ function updateAutosaveLabel() {
   }
 }
 
-/** Mostra la modale con anteprima dei dati del backup da importare */
 function showImportPreview(data) {
-  // Validazione struttura minima
   const errEl = document.getElementById('import-error');
   errEl.classList.add('hidden');
 
@@ -1312,7 +1271,6 @@ function showImportPreview(data) {
     return;
   }
 
-  // Formatta data esportazione
   let exportDateStr = '–';
   if (data.exportDate) {
     try { exportDateStr = fmtDate(data.exportDate); } catch (e) { }
@@ -1331,18 +1289,12 @@ function showImportPreview(data) {
     </div>
   `;
 
-  // Salva dati in memoria temporanea per il confirm
   window._importData = { att, spot, diario, catture };
-
-  // Bottone conferma
   document.getElementById('btn-import-confirm').onclick = () => confirmImport();
-
   document.getElementById('modal-import').classList.remove('hidden');
-  // Chiudi menu mobile se aperto
   document.getElementById('mobile-nav').classList.add('hidden');
 }
 
-/** Mostra errore nella modale (o in un alert se la modale non è ancora aperta) */
 function showImportError(msg) {
   document.getElementById('import-preview').innerHTML =
     `<span style="color:var(--c-coral)">❌ ${escHtml(msg)}</span>`;
@@ -1350,7 +1302,6 @@ function showImportError(msg) {
   document.getElementById('modal-import').classList.remove('hidden');
 }
 
-/** Esegue l'importazione sovrascrivendo i dati locali */
 function confirmImport() {
   const { att, spot, diario, catture } = window._importData || {};
   if (!att && !spot && !diario && !catture) return;
@@ -1387,13 +1338,7 @@ function closeModalImport() {
 /* ============================================================
    TOAST NOTIFICA
    ============================================================ */
-/**
- * Mostra un toast temporaneo in basso allo schermo.
- * @param {string} msg  - Testo del messaggio
- * @param {string} type - 'success' | 'error'
- */
 function showToast(msg, type = 'success') {
-  // Rimuovi toast esistenti
   document.querySelectorAll('.fi-toast').forEach(t => t.remove());
 
   const toast = document.createElement('div');
@@ -1411,7 +1356,6 @@ function showToast(msg, type = 'success') {
       : 'background: linear-gradient(135deg,#FF6B6B,#FF4444); color: white;'}
   `;
 
-  // Keyframes inline se non esistono già
   if (!document.getElementById('toast-style')) {
     const style = document.createElement('style');
     style.id = 'toast-style';
@@ -1442,25 +1386,17 @@ window.addEventListener('resize', () => {
 /* ============================================================
    FOTO — helper condivisi
    ============================================================ */
-/**
- * Inizializza un input file per la foto e mostra la preview.
- * @param {string} inputId     - id dell'input type="file"
- * @param {string} imgId       - id dell'img preview
- * @param {string} previewId   - id del wrapper preview
- * @param {string} globalKey   - chiave window._xxxFotoBase64
- */
 function initFotoInput(inputId, imgId, previewId, globalKey) {
   const input = document.getElementById(inputId);
   if (!input) return;
   input.addEventListener('change', () => {
     const file = input.files[0];
     if (!file) return;
-    // Ridimensiona e converte in base64
     const reader = new FileReader();
     reader.onload = evt => {
       const img = new Image();
       img.onload = () => {
-        const MAX = 1024; // px max lato
+        const MAX = 1024;
         let w = img.width, h = img.height;
         if (w > MAX || h > MAX) {
           if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -1480,7 +1416,6 @@ function initFotoInput(inputId, imgId, previewId, globalKey) {
   });
 }
 
-/** Resetta stato foto */
 function resetFoto(inputId, imgId, previewId, globalKey) {
   const input = document.getElementById(inputId);
   if (input) input.value = '';
@@ -1491,12 +1426,11 @@ function resetFoto(inputId, imgId, previewId, globalKey) {
   window[globalKey] = null;
 }
 
-/** Apre modale fullscreen per una foto base64 */
 function openFotoFullscreen(id, type) {
-  let lista, item;
+  let lista;
   if (type === 'spot') lista = lsGet(LS_SPOT);
   if (type === 'cattura') lista = lsGet(LS_CATTURE);
-  item = lista.find(x => x.id === id);
+  const item = lista.find(x => x.id === id);
   if (!item || !item.foto) return;
   document.getElementById('modal-foto-img').src = item.foto;
   document.getElementById('modal-foto').classList.remove('hidden');
@@ -1507,7 +1441,6 @@ function openFotoFullscreen(id, type) {
    ============================================================ */
 function initCattureEvents() {
   document.getElementById('btn-add-cattura').addEventListener('click', () => {
-    // Precompila data odierna
     document.getElementById('cattura-data').value = new Date().toISOString().slice(0, 10);
     document.getElementById('modal-cattura').classList.remove('hidden');
   });
@@ -1517,7 +1450,6 @@ function initCattureEvents() {
   });
   document.getElementById('form-cattura').addEventListener('submit', saveCattura);
 
-  // Foto cattura
   initFotoInput('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
   document.getElementById('cattura-foto-remove').addEventListener('click', () => {
     resetFoto('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
@@ -1564,22 +1496,18 @@ function renderCatture() {
   if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  // Ordina per data decrescente
   const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
 
   sorted.forEach((c, i) => {
-    // Inserisci banner AdSense ogni 6 card
     if (i > 0 && i % 6 === 0) {
       const adDiv = document.createElement('div');
       adDiv.className = 'ad-banner-catture';
-      adDiv.innerHTML = '<!-- ADSENSE SLOT —  sostituire con blocco ins quando attivo -->';
       container.appendChild(adDiv);
     }
 
     const card = document.createElement('div');
     card.className = 'cattura-card';
 
-    // Foto o placeholder
     const fotoHtml = c.foto
       ? `<img class="cattura-foto" src="${c.foto}" alt="Foto cattura" />`
       : `<div class="cattura-no-foto">🐟</div>`;
@@ -1603,7 +1531,6 @@ function renderCatture() {
       </div>
     `;
 
-    // Tap foto → fullscreen
     if (c.foto) {
       card.querySelector('.cattura-foto').addEventListener('click', () => openFotoFullscreen(c.id, 'cattura'));
     }
@@ -1632,7 +1559,6 @@ function initPWA() {
   const btnBanner = document.getElementById('btn-install-banner');
   const btnBannerX = document.getElementById('btn-install-banner-close');
 
-  // Se già aperta come app standalone non mostrare nulla
   if (window.matchMedia('(display-mode: standalone)').matches) return;
 
   function showInstallUI() {
@@ -1658,13 +1584,11 @@ function initPWA() {
     }
   }
 
-  // Chrome cattura qui il prompt — mostra subito l'UI di installazione
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
     showInstallUI();
 
-    // Lancia il prompt al primo tocco dell'utente (una volta sola)
     const autoPrompt = () => {
       if (deferredPrompt) doInstall();
     };
