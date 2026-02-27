@@ -133,6 +133,54 @@
       color: #fff;
       text-decoration: none;
     }
+
+    /* ── LIGHT THEME OVERRIDES per sezione Guide ── */
+    body.light .guide-section-desc {
+      color: rgba(0,0,0,.60);
+    }
+    body.light .guide-section-category {
+      color: rgba(0,0,0,.38);
+    }
+    body.light .guide-section-category::after {
+      background: rgba(0,0,0,.12);
+    }
+    body.light .guide-app-card {
+      background: rgba(0,0,0,.04);
+      border-color: rgba(0,0,0,.12);
+    }
+    body.light .guide-app-card:hover {
+      background: rgba(0,150,120,.06);
+      border-color: rgba(0,150,120,.30);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+    body.light .gac-body h3 {
+      color: #1a2a3a;
+    }
+    body.light .gac-body p {
+      color: rgba(0,0,0,.52);
+    }
+    body.light .gac-arrow {
+      color: rgba(0,150,120,.75);
+    }
+    body.light .firma-fixed span {
+      color: rgba(0,0,0,.28);
+    }
+    body.light .firma-link {
+      color: rgba(0,0,0,.38);
+    }
+    body.light .firma-link:hover {
+      color: #00a88c;
+    }
+    body.light .btn-secondary {
+      background: rgba(0,0,0,.05);
+      border-color: rgba(0,0,0,.15);
+      color: rgba(0,0,0,.65);
+    }
+    body.light .btn-secondary:hover {
+      background: rgba(0,0,0,.09);
+      border-color: rgba(0,0,0,.25);
+      color: rgba(0,0,0,.9);
+    }
   </style>
   <!-- ADSENSE -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299744740820480"
@@ -571,77 +619,76 @@
       </div>
     </section>
 
+    <!-- ============ GUIDE ============ -->
+    <section id="section-guide" class="section hidden">
+      <div class="section-inner">
+        <div class="section-top-bar">
+          <h2 class="page-title">📖 Guide di Pesca</h2>
+          <a href="/about.html" class="btn-secondary">ℹ️ Chi Siamo</a>
+        </div>
+
+        <p class="guide-section-desc">Tecniche, attrezzatura e consigli pratici per migliorare ogni uscita — scritti da pescatori per pescatori.</p>
+
+        <div class="guide-section-category">🌊 Pesca in Mare</div>
+        <div class="guide-cards-grid">
+          <a class="guide-app-card" href="/guide-surfcasting.html" target="_blank" rel="noopener">
+            <span class="gac-icon">🌊</span>
+            <div class="gac-body">
+              <h3>Surfcasting</h3>
+              <p>Canna, piombi, esche e tecniche di lancio per pescare orate, spigole e mormore dalla spiaggia.</p>
+            </div>
+            <span class="gac-arrow">↗</span>
+          </a>
+          <a class="guide-app-card" href="/guide-bolognese.html" target="_blank" rel="noopener">
+            <span class="gac-icon">🎣</span>
+            <div class="gac-body">
+              <h3>Pesca a Bolognese</h3>
+              <p>La tecnica più versatile — canna, galleggiante, piombatura e tecniche per ogni ambiente.</p>
+            </div>
+            <span class="gac-arrow">↗</span>
+          </a>
+          <a class="guide-app-card" href="/guide-spinning-mare.html" target="_blank" rel="noopener">
+            <span class="gac-icon">🐟</span>
+            <div class="gac-body">
+              <h3>Spinning in Mare</h3>
+              <p>Jig, minnow e softbait per spigole, lecce e ricciole. Tecniche di animazione da riva.</p>
+            </div>
+            <span class="gac-arrow">↗</span>
+          </a>
+        </div>
+
+        <div class="guide-section-category">🏞️ Pesca in Lago e Acqua Dolce</div>
+        <div class="guide-cards-grid">
+          <a class="guide-app-card" href="/guide-carpfishing.html" target="_blank" rel="noopener">
+            <span class="gac-icon">🏕️</span>
+            <div class="gac-body">
+              <h3>Carpfishing</h3>
+              <p>Boilies, hair rig, pastura e lettura del lago. La guida completa per iniziare con le carpe.</p>
+            </div>
+            <span class="gac-arrow">↗</span>
+          </a>
+          <a class="guide-app-card" href="/guide-spinning-lago.html" target="_blank" rel="noopener">
+            <span class="gac-icon">🎿</span>
+            <div class="gac-body">
+              <h3>Spinning in Lago</h3>
+              <p>Lucci, persici e trote: esche artificiali e tecniche per i predatori d'acqua dolce.</p>
+            </div>
+            <span class="gac-arrow">↗</span>
+          </a>
+        </div>
+
+        <!-- AdSense fondo Guide — push() da JS -->
+        <div class="ad-section-banner">
+          <ins id="ad-guide" class="adsbygoogle" style="display:block"
+            data-ad-client="ca-pub-9299744740820480"
+            data-ad-slot="1789596216"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        </div>
+      </div>
+    </section>
+
   </div><!-- /app -->
-
-  <!-- ===== SEZIONE GUIDE ===== -->
-  <!-- Questa sezione è statica e crawlabile da Google anche senza JS -->
-  <section id="section-guide" class="section hidden">
-    <div class="section-inner">
-      <div class="section-top-bar">
-        <h2 class="page-title">📖 Guide di Pesca</h2>
-        <a href="/about.html" class="btn-secondary">ℹ️ Chi Siamo</a>
-      </div>
-
-      <p class="guide-section-desc">Tecniche, attrezzatura e consigli pratici per migliorare ogni uscita — scritti da pescatori per pescatori.</p>
-
-      <div class="guide-section-category">🌊 Pesca in Mare</div>
-      <div class="guide-cards-grid">
-        <a class="guide-app-card" href="/guide-surfcasting.html" target="_blank" rel="noopener">
-          <span class="gac-icon">🌊</span>
-          <div class="gac-body">
-            <h3>Surfcasting</h3>
-            <p>Canna, piombi, esche e tecniche di lancio per pescare orate, spigole e mormore dalla spiaggia.</p>
-          </div>
-          <span class="gac-arrow">↗</span>
-        </a>
-        <a class="guide-app-card" href="/guide-bolognese.html" target="_blank" rel="noopener">
-          <span class="gac-icon">🎣</span>
-          <div class="gac-body">
-            <h3>Pesca a Bolognese</h3>
-            <p>La tecnica più versatile — canna, galleggiante, piombatura e tecniche per ogni ambiente.</p>
-          </div>
-          <span class="gac-arrow">↗</span>
-        </a>
-        <a class="guide-app-card" href="/guide-spinning-mare.html" target="_blank" rel="noopener">
-          <span class="gac-icon">🐟</span>
-          <div class="gac-body">
-            <h3>Spinning in Mare</h3>
-            <p>Jig, minnow e softbait per spigole, lecce e ricciole. Tecniche di animazione da riva.</p>
-          </div>
-          <span class="gac-arrow">↗</span>
-        </a>
-      </div>
-
-      <div class="guide-section-category">🏞️ Pesca in Lago e Acqua Dolce</div>
-      <div class="guide-cards-grid">
-        <a class="guide-app-card" href="/guide-carpfishing.html" target="_blank" rel="noopener">
-          <span class="gac-icon">🏕️</span>
-          <div class="gac-body">
-            <h3>Carpfishing</h3>
-            <p>Boilies, hair rig, pastura e lettura del lago. La guida completa per iniziare con le carpe.</p>
-          </div>
-          <span class="gac-arrow">↗</span>
-        </a>
-        <a class="guide-app-card" href="/guide-spinning-lago.html" target="_blank" rel="noopener">
-          <span class="gac-icon">🎿</span>
-          <div class="gac-body">
-            <h3>Spinning in Lago</h3>
-            <p>Lucci, persici e trote: esche artificiali e tecniche per i predatori d'acqua dolce.</p>
-          </div>
-          <span class="gac-arrow">↗</span>
-        </a>
-      </div>
-
-      <!-- AdSense fondo Guide — push() da JS -->
-      <div class="ad-section-banner">
-        <ins id="ad-guide" class="adsbygoogle" style="display:block"
-          data-ad-client="ca-pub-9299744740820480"
-          data-ad-slot="1789596216"
-          data-ad-format="auto"
-          data-full-width-responsive="true"></ins>
-      </div>
-    </div>
-  </section>
 
   <!-- ===== MODALI ===== -->
 
