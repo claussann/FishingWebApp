@@ -10,15 +10,167 @@
   <meta name="apple-mobile-web-app-title" content="Fishing Inv" />
   <meta name="google-adsense-account" content="ca-pub-9299744740820480">
   <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="description" content="Fishing Inventory — l'app gratuita per pescatori italiani. Gestisci attrezzatura, spot GPS, diario uscite e catture. Nessuna registrazione richiesta." />
+  <meta name="keywords" content="pesca, attrezzatura pesca, spot pesca, diario pesca, carpfishing, surfcasting, spinning, pesca italia" />
   <title>Fishing Inventory</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── SEZIONE GUIDE IN-APP ── */
+    .guide-section-desc {
+      font-size: .92rem;
+      color: var(--c-white60);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+    .guide-section-category {
+      font-family: var(--font-display, 'Syne', sans-serif);
+      font-size: .72rem;
+      font-weight: 800;
+      color: var(--c-white30, rgba(255,255,255,.3));
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      margin: 28px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .guide-section-category::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--card-border, rgba(255,255,255,.13));
+    }
+    .guide-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    @media (min-width: 560px) { .guide-cards-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 900px) { .guide-cards-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .guide-app-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--card-bg, rgba(255,255,255,.07));
+      border: 1px solid var(--card-border, rgba(255,255,255,.13));
+      border-radius: 14px;
+      padding: 16px 14px;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      position: relative;
+    }
+    .guide-app-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+      border-color: rgba(0,201,167,.35);
+      text-decoration: none;
+    }
+    .gac-icon { font-size: 1.6rem; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+    .gac-body { flex: 1; min-width: 0; }
+    .gac-body h3 {
+      font-family: var(--font-display, 'Syne', sans-serif);
+      font-size: .93rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 5px;
+    }
+    .gac-body p {
+      font-size: .80rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .gac-arrow {
+      font-size: .85rem;
+      color: rgba(0,201,167,.7);
+      flex-shrink: 0;
+      font-weight: 800;
+      align-self: center;
+    }
+
+    /* ── FIRMA / FOOTER LINKS ── */
+    .firma-fixed {
+      display: flex !important;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+    }
+    .firma-fixed span {
+      font-size: .72rem;
+      color: rgba(255,255,255,.25);
+    }
+    .firma-link {
+      font-size: .72rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.3);
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .firma-link:hover { color: #00C9A7; }
+
+    /* ── BTN SECONDARY (link Chi Siamo nella top-bar guide) ── */
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.7);
+      font-size: .82rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.25);
+      color: #fff;
+      text-decoration: none;
+    }
+  </style>
   <!-- ADSENSE -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299744740820480"
     crossorigin="anonymous"></script>
 </head>
 
 <body>
+
+  <!-- NOSCRIPT: contenuto visibile ai crawler Google (non eseguono JS) -->
+  <noscript>
+    <div style="max-width:800px;margin:40px auto;padding:24px;font-family:sans-serif;color:#ccc;background:#0f1923;border-radius:12px;">
+      <h1 style="color:#00C9A7;font-size:1.8rem;margin-bottom:8px;">🎣 Fishing Inventory</h1>
+      <p style="color:rgba(255,255,255,.7);margin-bottom:20px;">L'app gratuita per pescatori italiani. Gestisci attrezzatura, spot GPS, diario uscite e catture — tutto in un posto, senza registrazione.</p>
+      <h2 style="color:#fff;font-size:1.1rem;margin-bottom:10px;">Funzionalità principali</h2>
+      <ul style="color:rgba(255,255,255,.7);padding-left:20px;line-height:1.9;">
+        <li>🎣 Catalogo attrezzatura: canne, mulinelli, minuteria con tecnica e ambiente</li>
+        <li>📍 Mappa spot di pesca con coordinate GPS</li>
+        <li>📔 Diario uscite con data, orario, spot e attrezzatura usata</li>
+        <li>🐟 Registro catture con foto e peso</li>
+        <li>📊 Statistiche annuali e grafici uscite mensili</li>
+        <li>🌤️ Meteo integrato per la tua zona di pesca</li>
+        <li>💾 Backup e ripristino dati con file JSON</li>
+        <li>📲 Installabile come PWA — funziona anche offline</li>
+      </ul>
+      <h2 style="color:#fff;font-size:1.1rem;margin:20px 0 10px;">Guide di Pesca</h2>
+      <ul style="color:rgba(255,255,255,.7);padding-left:20px;line-height:2;">
+        <li><a href="/guide-surfcasting.html" style="color:#00C9A7;">Guida al Surfcasting</a> — attrezzatura, esche e tecniche di lancio</li>
+        <li><a href="/guide-bolognese.html" style="color:#00C9A7;">Pesca a Bolognese</a> — dalla canna alle tecniche di pasturazione</li>
+        <li><a href="/guide-spinning-mare.html" style="color:#00C9A7;">Spinning in Mare</a> — jig, minnow e animazione per spigole e lecce</li>
+        <li><a href="/guide-carpfishing.html" style="color:#00C9A7;">Carpfishing per Principianti</a> — boilies, hair rig e lettura del lago</li>
+        <li><a href="/guide-spinning-lago.html" style="color:#00C9A7;">Spinning in Lago</a> — lucci, persici e trote con le artificiali</li>
+      </ul>
+      <p style="margin-top:20px;font-size:.8rem;color:rgba(255,255,255,.3);">
+        <a href="/about.html" style="color:rgba(255,255,255,.3);">Chi Siamo</a> &nbsp;·&nbsp;
+        <a href="/privacy.html" style="color:rgba(255,255,255,.3);">Privacy Policy</a>
+      </p>
+    </div>
+  </noscript>
 
   <!-- ===================== SPLASH SCREEN ===================== -->
   <div id="splash-screen">
@@ -77,6 +229,7 @@
         <button class="nav-btn" data-section="diario">📔 Diario</button>
         <button class="nav-btn" data-section="catture">🐟 Catture</button>
         <button class="nav-btn" data-section="statistiche">📊 Statistiche</button>
+        <button class="nav-btn" data-section="guide">📖 Guide</button>
         <button class="nav-btn nav-backup" id="btn-backup">💾 Salva</button>
         <button class="nav-btn nav-import" id="btn-import">📂 Carica</button>
         <button class="pwa-install-btn hidden" id="btn-pwa-install" title="Installa App">📲 Scarica App</button>
@@ -93,6 +246,7 @@
       <button class="mob-btn" data-section="diario">📔 Diario</button>
       <button class="mob-btn" data-section="catture">🐟 Catture</button>
       <button class="mob-btn" data-section="statistiche">📊 Statistiche</button>
+      <button class="mob-btn" data-section="guide">📖 Guide</button>
       <button class="mob-btn mob-backup" id="btn-backup-mob">💾 Salva Backup</button>
       <button class="mob-btn mob-import" id="btn-import-mob">📂 Carica Backup</button>
       <button class="mob-btn mob-pwa hidden" id="btn-pwa-mob">📲 Scarica App</button>
@@ -419,6 +573,76 @@
 
   </div><!-- /app -->
 
+  <!-- ===== SEZIONE GUIDE ===== -->
+  <!-- Questa sezione è statica e crawlabile da Google anche senza JS -->
+  <section id="section-guide" class="section hidden">
+    <div class="section-inner">
+      <div class="section-top-bar">
+        <h2 class="page-title">📖 Guide di Pesca</h2>
+        <a href="/about.html" class="btn-secondary">ℹ️ Chi Siamo</a>
+      </div>
+
+      <p class="guide-section-desc">Tecniche, attrezzatura e consigli pratici per migliorare ogni uscita — scritti da pescatori per pescatori.</p>
+
+      <div class="guide-section-category">🌊 Pesca in Mare</div>
+      <div class="guide-cards-grid">
+        <a class="guide-app-card" href="/guide-surfcasting.html" target="_blank" rel="noopener">
+          <span class="gac-icon">🌊</span>
+          <div class="gac-body">
+            <h3>Surfcasting</h3>
+            <p>Canna, piombi, esche e tecniche di lancio per pescare orate, spigole e mormore dalla spiaggia.</p>
+          </div>
+          <span class="gac-arrow">↗</span>
+        </a>
+        <a class="guide-app-card" href="/guide-bolognese.html" target="_blank" rel="noopener">
+          <span class="gac-icon">🎣</span>
+          <div class="gac-body">
+            <h3>Pesca a Bolognese</h3>
+            <p>La tecnica più versatile — canna, galleggiante, piombatura e tecniche per ogni ambiente.</p>
+          </div>
+          <span class="gac-arrow">↗</span>
+        </a>
+        <a class="guide-app-card" href="/guide-spinning-mare.html" target="_blank" rel="noopener">
+          <span class="gac-icon">🐟</span>
+          <div class="gac-body">
+            <h3>Spinning in Mare</h3>
+            <p>Jig, minnow e softbait per spigole, lecce e ricciole. Tecniche di animazione da riva.</p>
+          </div>
+          <span class="gac-arrow">↗</span>
+        </a>
+      </div>
+
+      <div class="guide-section-category">🏞️ Pesca in Lago e Acqua Dolce</div>
+      <div class="guide-cards-grid">
+        <a class="guide-app-card" href="/guide-carpfishing.html" target="_blank" rel="noopener">
+          <span class="gac-icon">🏕️</span>
+          <div class="gac-body">
+            <h3>Carpfishing</h3>
+            <p>Boilies, hair rig, pastura e lettura del lago. La guida completa per iniziare con le carpe.</p>
+          </div>
+          <span class="gac-arrow">↗</span>
+        </a>
+        <a class="guide-app-card" href="/guide-spinning-lago.html" target="_blank" rel="noopener">
+          <span class="gac-icon">🎿</span>
+          <div class="gac-body">
+            <h3>Spinning in Lago</h3>
+            <p>Lucci, persici e trote: esche artificiali e tecniche per i predatori d'acqua dolce.</p>
+          </div>
+          <span class="gac-arrow">↗</span>
+        </a>
+      </div>
+
+      <!-- AdSense fondo Guide — push() da JS -->
+      <div class="ad-section-banner">
+        <ins id="ad-guide" class="adsbygoogle" style="display:block"
+          data-ad-client="ca-pub-9299744740820480"
+          data-ad-slot="1789596216"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== MODALI ===== -->
 
   <!-- MODALE ATTREZZATURA -->
@@ -645,8 +869,13 @@
     </div>
   </div>
 
-  <!-- FIRMA AUTORE -->
-  <div class="firma-fixed">Autore Claudio Sanna</div>
+  <!-- FOOTER LINKS — visibili a Google e utenti -->
+  <div class="firma-fixed">
+    <span>Autore Claudio Sanna</span>
+    <a href="/about.html" class="firma-link">ℹ️ Chi Siamo</a>
+    <a href="/guide.html" class="firma-link">📖 Guide</a>
+    <a href="/privacy.html" class="firma-link">🔒 Privacy</a>
+  </div>
 
   <!-- AdSense Anchor sticky mobile — push() da JS dopo splash -->
   <div class="ad-anchor-mobile">
