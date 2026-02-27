@@ -295,6 +295,7 @@ function showSection(name) {
     diario:       'ad-diario',
     statistiche:  'ad-statistiche',
     catture:      'ad-catture',
+    guide:        'ad-guide',
   };
   if (adMap[name]) {
     // Delay 300ms: il browser deve prima rendere la sezione visibile
