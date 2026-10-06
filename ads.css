@@ -1,0 +1,8 @@
+.fi-ad-space { position:relative; max-width:1100px; margin:40px auto; padding:24px 0 0; min-height:120px; clear:both; border-top:1px solid rgba(127,149,166,.2); }
+.fi-ad-label { display:block; color:#889ca8; font:11px/1.5 system-ui,sans-serif; text-align:center; letter-spacing:1px; margin-bottom:14px; }
+.fi-ad-preview { border:1px dashed rgba(127,149,166,.3); border-radius:12px; background:rgba(127,149,166,.025); min-height:120px; }
+.fi-ad-preview ins { display:none !important; }
+html:not(.fi-ads-consented) .fi-ad-space:not(.fi-ad-preview) { display:none; }
+.fi-ad-space[hidden] { display:none !important; }
+.fi-ads-unavailable .fi-ad-space:not(.fi-ad-preview) { display:none; }
+[data-privacy-preferences] { border:0; background:none; color:inherit; font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }

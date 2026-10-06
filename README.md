@@ -1,151 +1,72 @@
-# 🎣 Fishing Inventory
+# Fishing Inventory 4
 
-> Il tuo diario di pesca digitale | Your digital fishing diary
+PWA gratuita per organizzare attrezzatura, spot, uscite e catture. HTML, CSS e JavaScript statici, senza build, backend o account. I dati restano nel browser e i backup JSON delle versioni precedenti conservano gli stessi identificatori e collegamenti.
 
----
+## Funzioni
 
-## 🇮🇹 Italiano
+- Home immediata, azioni rapide, percorso iniziale, tema chiaro/scuro e navigazione mobile.
+- Tema mare con blu profondo, bianco schiuma, superfici metalliche e onda SVG con effetto 3D. Il comando Effetti conserva la preferenza; le animazioni rispettano la riduzione del movimento del dispositivo e si fermano quando la hero non è visibile. Nessuna libreria grafica aggiuntiva.
+- Inventario, spot, diario e catture con inserimento, modifica, ricerca e ordinamento.
+- Preferiti per attrezzatura e spot; ultima eliminazione annullabile anche dopo una riapertura.
+- Spot su Leaflet/OpenStreetMap o con coordinate manuali, disponibili anche se la mappa non carica. Posizione richiesta soltanto premendo il pulsante dedicato.
+- Catture con foto ridotta, peso, lunghezza, spot e indicazione del rilascio.
+- Statistiche sulle uscite e riepilogo annuale delle catture.
+- Checklist per uscita generica, spinning, surfcasting e carpfishing.
+- Backup JSON completo, importazione validata con unione/sostituzione e copia di recupero. CSV per consultare le singole raccolte con un foglio di calcolo.
+- Bussola: assistente gratuito con regole e risposte guidate, locale e offline. Non è un modello AI generativo e non invia domande a servizi esterni.
+- Meteo MET Norway CC BY 4.0 con attribuzione, richieste manuali, cache e gestione degli errori. Non è un bollettino di sicurezza.
+- App shell e pagine editoriali disponibili offline dopo il primo caricamento. Aggiornamenti tramite service worker con pulsante di ricarica.
+- AdSense predisposto con ID originali, consenso certificato Google, caricamento degli slot visibili e anteprima senza annunci reali. L’attivazione nell’account è descritta in [ADSENSE_SETUP.md](ADSENSE_SETUP.md).
 
-### Descrizione
-**Fishing Inventory** è una web app frontend-only per gestire la tua attrezzatura da pesca, salvare i tuoi spot preferiti, tenere un diario delle uscite e consultare le statistiche — tutto salvato in locale sul tuo browser, senza nessun account o server.
+## Avvio locale
 
-### ✨ Funzionalità
-- 🌤️ **Meteo in tempo reale** — cerca qualsiasi città e ottieni temperatura, vento e umidità (API Open-Meteo + Nominatim, completamente gratuite)
-- 🎣 **Gestione Attrezzatura** — aggiungi canne, mulinelli e minuteria con tipo, ambiente di pesca (mare, barca, acqua dolce), tecnica, grammatura, quantità e note
-- 📍 **Spot di Pesca** — salva i tuoi spot sulla mappa con geolocalizzazione GPS, categoria (spiaggia, lago, fiume...) e note
-- 📔 **Diario Uscite** — registra ogni sessione con data, orario, spot utilizzato, attrezzatura usata e commenti
-- 📊 **Statistiche** — grafico uscite per mese, top spot più visitati, top attrezzatura più usata, record personali
-- 💾 **Backup JSON** — esporta tutti i dati in un file `.json` e importali su qualsiasi altro dispositivo
-- 🌙☀️ **Tema Dark / Light** — cambia tema con un click, preferenza salvata automaticamente
+Con Python installato, aprire un terminale nella cartella del progetto:
 
-### 🗺️ Tecnologie Utilizzate
-| Tecnologia | Utilizzo |
-|---|---|
-| Claude.ai | App core |
-| HTML / CSS / JavaScript vanilla | Core dell'applicazione |
-| [Leaflet.js](https://leafletjs.com/) | Mappa interattiva |
-| [OpenStreetMap](https://www.openstreetmap.org/) | Tile della mappa (gratuito) |
-| [Open-Meteo](https://open-meteo.com/) | API meteo (gratuita, no key) |
-| [Nominatim](https://nominatim.org/) | Geocoding città (gratuito) |
-| Google Fonts (Syne + Nunito) | Tipografia |
-| localStorage | Salvataggio dati in locale |
-
-### 🚀 Come Avviare
-Non è richiesta nessuna installazione. Basta:
-
-1. Clona o scarica la repository
-```bash
-git clone https://github.com/tuo-username/fishing-inventory.git
-```
-2. Entra nella cartella
-```bash
-cd fishing-inventory
-```
-3. Apri `index.html` nel browser
-
-> ⚠️ Per la geolocalizzazione GPS, alcuni browser richiedono che il file sia servito tramite `http://` (non `file://`). In quel caso usa un server locale semplice:
-> ```bash
-> npx serve .
-> # oppure
-> python -m http.server 8080
-> ```
-
-### 📁 Struttura del Progetto
-```
-fishing-inventory/
-├── index.html      # Struttura HTML e modali
-├── style.css       # Stili, tema dark/light, responsive
-├── script.js       # Logica app, API, localStorage
-└── README.md       # Questo file
+```sh
+python -m http.server 8765 --bind 127.0.0.1
 ```
 
-### 💾 Backup e Importazione
-- Clicca **💾 Esporta** per scaricare un file `fishing-inventory-backup-YYYY-MM-DD.json`
-- Clicca **📂 Importa** per caricare un backup su un altro dispositivo
-- Il file JSON contiene: attrezzatura, spot e diario uscite
+Aprire `http://127.0.0.1:8765/`. Non aprire `index.html` con `file://`: service worker e alcune API richiedono un’origine HTTP/HTTPS. In alternativa usare un normale server statico, per esempio Live Server.
 
-### 🛠️ Personalizzazione
-Tutte le variabili di stile si trovano in cima a `style.css` nella sezione `:root`. Puoi cambiare colori, font e dimensioni facilmente.
+## Verifica
 
-### 📱 Versione Mobile
-È in sviluppo una versione **React Native** con Expo che include funzionalità aggiuntive come foto attrezzatura dalla fotocamera, notifiche e promemoria, e GPS nativo.
+Node.js 18 o successivo, senza installare pacchetti:
 
-### 📄 Licenza
-Questo progetto è rilasciato sotto licenza [MIT](LICENSE).
-
----
-
-## 🇬🇧 English
-
-### Description
-**Fishing Inventory** is a frontend-only web app to manage your fishing gear, save your favourite spots, keep a fishing diary and track your statistics — everything stored locally in your browser, no account or server required.
-
-### ✨ Features
-- 🌤️ **Real-time Weather** — search any city and get temperature, wind and humidity (Open-Meteo + Nominatim APIs, completely free)
-- 🎣 **Gear Management** — add rods, reels and tackle with type, fishing environment (sea, boat, freshwater), technique, weight, quantity and notes
-- 📍 **Fishing Spots** — save your spots on the map with GPS geolocation, category (beach, lake, river...) and notes
-- 📔 **Fishing Diary** — log every session with date, time, spot used, gear used and comments
-- 📊 **Statistics** — monthly outing chart, top visited spots, top gear used, personal records
-- 💾 **JSON Backup** — export all your data to a `.json` file and import it on any other device
-- 🌙☀️ **Dark / Light Theme** — switch theme with one click, preference saved automatically
-
-### 🗺️ Technologies Used
-| Technology | Purpose |
-|---|---|
-| Claude.ai | App core |
-| HTML / CSS / Vanilla JavaScript | App core |
-| [Leaflet.js](https://leafletjs.com/) | Interactive map |
-| [OpenStreetMap](https://www.openstreetmap.org/) | Map tiles (free) |
-| [Open-Meteo](https://open-meteo.com/) | Weather API (free, no key needed) |
-| [Nominatim](https://nominatim.org/) | City geocoding (free) |
-| Google Fonts (Syne + Nunito) | Typography |
-| localStorage | Local data storage |
-
-### 🚀 Getting Started
-No installation required. Simply:
-
-1. Clone or download the repository
-```bash
-git clone https://github.com/your-username/fishing-inventory.git
-```
-2. Enter the folder
-```bash
-cd fishing-inventory
-```
-3. Open `index.html` in your browser
-
-> ⚠️ For GPS geolocation, some browsers require the file to be served over `http://` (not `file://`). In that case use a simple local server:
-> ```bash
-> npx serve .
-> # or
-> python -m http.server 8080
-> ```
-
-### 📁 Project Structure
-```
-fishing-inventory/
-├── index.html      # HTML structure and modals
-├── style.css       # Styles, dark/light theme, responsive
-├── script.js       # App logic, APIs, localStorage
-└── README.md       # This file
+```sh
+node --test tests/regression.test.cjs
 ```
 
-### 💾 Backup & Import
-- Click **💾 Export** to download a `fishing-inventory-backup-YYYY-MM-DD.json` file
-- Click **📂 Import** to load a backup on another device
-- The JSON file contains: gear, spots and fishing diary entries
+I test verificano compatibilità dei backup v3, date e coordinate, neutralizzazione degli URL foto, ID duplicati, importazione, recupero dopo eliminazione, modifica senza duplicazione, rollback in caso di quota esaurita, risposte guidate, consenso pubblicitario e file dell’app shell.
 
-### 🛠️ Customisation
-All style variables are at the top of `style.css` in the `:root` section. You can easily change colours, fonts and sizes.
+## File principali
 
-### 📱 Mobile Version
-A **React Native** version with Expo is in development, featuring additional capabilities such as gear photos from the camera, push notifications and reminders, and native GPS.
+| File | Responsabilità |
+| --- | --- |
+| `index.html`, `style.css`, `upgrade.css` | Interfaccia responsive |
+| `script.js` | Funzioni principali e archivio locale |
+| `upgrade.js` | Ricerca, modifica, recupero, checklist, accessibilità e Bussola |
+| `data.js` | Validazione, importazione e scritture protette |
+| `weather.js` | MET Norway e ricerca geografica |
+| `ads-config.js`, `ads.js`, `ads.css` | Configurazione e caricamento pubblicitario |
+| `sw.js`, `manifest.json` | PWA e uso offline |
+| `help.html`, `privacy.html`, `contact.html` | Istruzioni e informazioni pubbliche |
+| `guide*.html`, `pages.css` | Guide editoriali di pesca |
+| `ads.txt`, `robots.txt`, `sitemap.xml`, `CNAME` | File pubblici di distribuzione |
 
-### 📄 License
-This project is released under the [MIT](LICENSE) license.
+## Conservazione dei dati
 
----
+Le chiavi originali restano `fi_attrezzatura`, `fi_spot`, `fi_diario`, `fi_catture`. La checklist e le copie di recupero usano chiavi aggiuntive, senza migrare o cancellare l’archivio esistente. Non esiste sincronizzazione cloud. Cambiare browser, profilo o dispositivo richiede trasferire un backup JSON.
 
-<div align="center">
-  Made with ❤️ and 🎣
-</div>
+Foto e copie di recupero consumano spazio locale. Se il browser non può scrivere, la modifica non viene dichiarata salvata. La copia pre-importazione viene scritta prima di sostituire i dati e la scrittura delle raccolte viene ripristinata in caso di errore. Il recupero mantiene soltanto l’ultima importazione e l’ultima eliminazione.
+
+Il backup automatico su file richiede File System Access e un file selezionato nella sessione corrente. Non apre finestre di salvataggio o download ripetuti in background. Su browser non compatibili usare il download manuale.
+
+## Pubblicazione
+
+Distribuzione statica dal repository già associato a GitHub Pages e al dominio indicato in `CNAME`. Non introdurre una build. Il proprietario deve approvare il push delle modifiche prima della pubblicazione.
+
+Nel codice restano publisher `ca-pub-9299744740820480` e unità `1789596216`. Sono valori già presenti nel repository, non una conferma dello stato dell’account. Pubblicare il messaggio CMP e verificare il sito in AdSense è necessario per attivare effettivamente la monetizzazione. Google decide l’approvazione.
+
+## Limiti dei servizi esterni
+
+Mappe di sfondo, ricerca geografica, meteo e annunci richiedono internet. MET Norway consente richieste browser semplici per siti a basso volume, identificati dall’Origin, rispettando cache e limiti: ad alto traffico serve un proxy con cache. Nominatim viene usato soltanto su ricerca esplicita della città, senza autocomplete. Dati meteo e mappe non attestano condizioni sicure o autorizzazioni alla pesca.

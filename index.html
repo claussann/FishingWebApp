@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f1923" />
+  <meta name="theme-color" content="#061629" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Fishing Inv" />
@@ -15,6 +15,7 @@
   <title>Fishing Inventory</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="upgrade.css" />
   <style>
     /* ── SEZIONE GUIDE IN-APP ── */
     .guide-section-desc {
@@ -183,79 +184,22 @@
     }
   </style>
   <!-- ADSENSE -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299744740820480"
-    crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://fishing-inventory.it/">
+<link rel="icon" href="/icon-192.png">
+<link rel="stylesheet" href="ads.css">
+<script defer src="ads-config.js"></script>
+<script defer src="ads.js"></script>
+<link rel="stylesheet" href="ocean.css">
 </head>
 
 <body>
+<a class="skip-link" href="#section-home">Vai al contenuto</a>
 
-  <!-- NOSCRIPT: contenuto visibile ai crawler Google (non eseguono JS) -->
-  <noscript>
-    <div style="max-width:800px;margin:40px auto;padding:24px;font-family:sans-serif;color:#ccc;background:#0f1923;border-radius:12px;">
-      <h1 style="color:#00C9A7;font-size:1.8rem;margin-bottom:8px;">🎣 Fishing Inventory</h1>
-      <p style="color:rgba(255,255,255,.7);margin-bottom:20px;">L'app gratuita per pescatori italiani. Gestisci attrezzatura, spot GPS, diario uscite e catture — tutto in un posto, senza registrazione.</p>
-      <h2 style="color:#fff;font-size:1.1rem;margin-bottom:10px;">Funzionalità principali</h2>
-      <ul style="color:rgba(255,255,255,.7);padding-left:20px;line-height:1.9;">
-        <li>🎣 Catalogo attrezzatura: canne, mulinelli, minuteria con tecnica e ambiente</li>
-        <li>📍 Mappa spot di pesca con coordinate GPS</li>
-        <li>📔 Diario uscite con data, orario, spot e attrezzatura usata</li>
-        <li>🐟 Registro catture con foto e peso</li>
-        <li>📊 Statistiche annuali e grafici uscite mensili</li>
-        <li>🌤️ Meteo integrato per la tua zona di pesca</li>
-        <li>💾 Backup e ripristino dati con file JSON</li>
-        <li>📲 Installabile come PWA — funziona anche offline</li>
-      </ul>
-      <h2 style="color:#fff;font-size:1.1rem;margin:20px 0 10px;">Guide di Pesca</h2>
-      <ul style="color:rgba(255,255,255,.7);padding-left:20px;line-height:2;">
-        <li><a href="/guide-surfcasting.html" style="color:#00C9A7;">Guida al Surfcasting</a> — attrezzatura, esche e tecniche di lancio</li>
-        <li><a href="/guide-bolognese.html" style="color:#00C9A7;">Pesca a Bolognese</a> — dalla canna alle tecniche di pasturazione</li>
-        <li><a href="/guide-spinning-mare.html" style="color:#00C9A7;">Spinning in Mare</a> — jig, minnow e animazione per spigole e lecce</li>
-        <li><a href="/guide-carpfishing.html" style="color:#00C9A7;">Carpfishing per Principianti</a> — boilies, hair rig e lettura del lago</li>
-        <li><a href="/guide-spinning-lago.html" style="color:#00C9A7;">Spinning in Lago</a> — lucci, persici e trote con le artificiali</li>
-      </ul>
-      <p style="margin-top:20px;font-size:.8rem;color:rgba(255,255,255,.3);">
-        <a href="/about.html" style="color:rgba(255,255,255,.3);">Chi Siamo</a> &nbsp;·&nbsp;
-        <a href="/privacy.html" style="color:rgba(255,255,255,.3);">Privacy Policy</a>
-      </p>
-    </div>
-  </noscript>
-
-  <!-- ===================== SPLASH SCREEN ===================== -->
-  <div id="splash-screen">
-    <div class="splash-bubbles">
-      <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
-      <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
-    </div>
-    <div class="splash-content">
-      <div class="splash-logo-wrap">
-        <svg class="splash-svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="65" cy="65" r="60" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)"
-            stroke-width="2" />
-          <ellipse cx="62" cy="68" rx="28" ry="16" fill="white" opacity="0.95" />
-          <polygon points="90,68 106,55 106,81" fill="white" opacity="0.75" />
-          <circle cx="47" cy="64" r="5" fill="#1a3a5c" />
-          <circle cx="45.5" cy="62.5" r="2" fill="white" />
-          <path d="M62 52 Q70 42 78 52" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"
-            opacity="0.6" />
-          <line x1="28" y1="20" x2="90" y2="57" stroke="#FFD166" stroke-width="3" stroke-linecap="round" />
-          <line x1="90" y1="57" x2="90" y2="78" stroke="#FFD166" stroke-width="2" stroke-dasharray="4,3"
-            opacity="0.8" />
-          <ellipse cx="90" cy="82" rx="6" ry="4" fill="#FF6B6B" />
-          <ellipse cx="90" cy="79" rx="6" ry="3.5" fill="#FF4444" />
-        </svg>
-      </div>
-      <h1 class="splash-title">Fishing<br>Inventory</h1>
-      <p class="splash-tagline">Il tuo diario di pesca digitale 🎣</p>
-      <div class="splash-loader-wrap">
-        <div class="splash-loader-bar">
-          <div class="splash-loader-fill"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<noscript><p class="no-script">Per usare l’inventario attiva JavaScript. Puoi comunque leggere le <a href="/guide.html">guide di pesca</a> e la <a href="/help.html">guida all’app</a>.</p></noscript>
 
   <!-- ===================== APP ===================== -->
-  <div id="app" class="hidden">
+  <div id="app">
 
     <!-- HEADER -->
     <header id="main-header">
@@ -264,13 +208,13 @@
           <ellipse cx="22" cy="25" rx="13" ry="8" fill="#fff" />
           <polygon points="35,25 44,18 44,32" fill="rgba(255,255,255,0.7)" />
           <circle cx="16" cy="23" r="2.5" fill="#1a3a5c" />
-          <line x1="10" y1="9" x2="35" y2="23" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round" />
-          <line x1="35" y1="23" x2="35" y2="33" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="3,2" />
+          <line x1="10" y1="9" x2="35" y2="23" stroke="#b7e7ff" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="35" y1="23" x2="35" y2="33" stroke="#b7e7ff" stroke-width="1.5" stroke-dasharray="3,2" />
           <circle cx="35" cy="36" r="3" fill="#FF6B6B" />
         </svg>
         <span class="header-brand-name">Fishing Inventory</span>
       </div>
-      <nav class="navbar">
+      <nav class="navbar" aria-label="Navigazione principale">
         <button class="nav-btn active" data-section="home">🏠 Home</button>
         <button class="nav-btn" data-section="attrezzatura">🎣 Attrezzatura</button>
         <button class="nav-btn" data-section="spot">📍 Spot</button>
@@ -278,12 +222,12 @@
         <button class="nav-btn" data-section="catture">🐟 Catture</button>
         <button class="nav-btn" data-section="statistiche">📊 Statistiche</button>
         <button class="nav-btn" data-section="guide">📖 Guide</button>
-        <button class="nav-btn nav-backup" id="btn-backup">💾 Salva</button>
-        <button class="nav-btn nav-import" id="btn-import">📂 Carica</button>
+        <button class="nav-btn nav-backup" id="btn-backup">↓ Backup</button>
+        <button class="nav-btn nav-import" id="btn-import">↑ Importa</button>
         <button class="pwa-install-btn hidden" id="btn-pwa-install" title="Installa App">📲 Scarica App</button>
         <button class="theme-toggle" id="btn-theme" title="Cambia tema">🌙</button>
       </nav>
-      <button class="hamburger" id="hamburger">☰</button>
+      <button class="hamburger" id="hamburger" aria-label="Apri menu" aria-controls="mobile-nav" aria-expanded="false">☰</button>
     </header>
 
     <!-- MOBILE NAV -->
@@ -301,17 +245,54 @@
       <button class="mob-btn mob-theme" id="btn-theme-mob">🌙 Cambia Tema</button>
     </div>
 
+    <div class="workspace-bar"><div><span class="status-dot"></span><span id="connection-status">Pronto per la tua prossima uscita</span></div><div class="workspace-actions"><button id="motion-toggle" class="motion-toggle" type="button" aria-pressed="false">◈ Effetti: fermi</button><button class="text-action" data-open-assistant>✦ Chiedi a Bussola</button></div></div>
     <!-- ============ HOME ============ -->
     <section id="section-home" class="section active">
 
       <div class="home-hero">
         <div class="hero-text">
-          <h2 class="hero-title">Ciao, pescatore! 👋</h2>
-          <p class="hero-sub">Gestisci attrezzatura, spot, uscite e statistiche tutto in un posto.</p>
+          <p class="eyebrow">IL TUO COMPAGNO DI PESCA</p>
+          <h1 class="hero-title">Meno preparativi.<br><span>Più tempo sull’acqua.</span></h1>
+          <p class="hero-sub">Attrezzatura in ordine, spot a portata di mano e ogni cattura da ricordare. Il tuo diario, senza registrazione.</p>
+          <div class="hero-actions"><button class="btn-primary" data-action="new-trip">+ Registra un’uscita</button><button class="btn-secondary" data-action="new-gear">Organizza l’attrezzatura ↗</button></div>
+          <p class="hero-trust">✓ Gratuita &nbsp; ✓ Dati sul dispositivo &nbsp; ✓ Pronta anche offline</p>
         </div>
-        <div class="hero-fish-deco">🐟</div>
+        <div class="hero-illustration" aria-hidden="true">
+          <div class="ocean-stage">
+            <div class="ocean-halo"></div>
+            <span class="ocean-caption">ORIZZONTE BLU</span>
+            <div class="ocean-float">
+              <svg class="ocean-wave" viewBox="0 0 440 400" fill="none">
+                <defs>
+                  <linearGradient id="wave-metal" x1="81" y1="132" x2="342" y2="325" gradientUnits="userSpaceOnUse"><stop stop-color="#effaff"/><stop offset=".16" stop-color="#83b4d5"/><stop offset=".32" stop-color="#fff"/><stop offset=".44" stop-color="#bad6e7"/><stop offset=".6" stop-color="#468fbd"/><stop offset=".79" stop-color="#d7f5ff"/><stop offset="1" stop-color="#467aa5"/></linearGradient>
+                  <linearGradient id="wave-blue" x1="101" y1="178" x2="331" y2="317" gradientUnits="userSpaceOnUse"><stop stop-color="#1479c7"/><stop offset=".34" stop-color="#58beef"/><stop offset=".51" stop-color="#097bb9"/><stop offset=".76" stop-color="#054274"/><stop offset="1" stop-color="#29a6e3"/></linearGradient>
+                  <linearGradient id="wave-foam" x1="128" y1="85" x2="283" y2="226" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"/><stop offset=".45" stop-color="#ecfaff"/><stop offset="1" stop-color="#6aa1c5"/></linearGradient>
+                  <linearGradient id="wave-edge" x1="65" y1="310" x2="357" y2="248" gradientUnits="userSpaceOnUse"><stop stop-color="#7dafd1"/><stop offset=".35" stop-color="#fff"/><stop offset=".75" stop-color="#b1e7ff"/><stop offset="1" stop-color="#3d7da7"/></linearGradient>
+                  <radialGradient id="wave-core"><stop stop-color="#00152c"/><stop offset="1" stop-color="#043d66"/></radialGradient>
+                  <radialGradient id="wave-shadow"><stop stop-color="#021322" stop-opacity=".8"/><stop offset="1" stop-color="#021322" stop-opacity="0"/></radialGradient>
+                </defs>
+                <ellipse cx="223" cy="343" rx="161" ry="28" fill="url(#wave-shadow)"/>
+                <path d="M68 290C118 280 100 219 131 156C165 83 244 54 306 91C348 116 349 165 319 198C302 217 276 222 253 210C285 186 290 160 271 147C242 126 212 167 220 206C230 260 298 297 372 285L361 317C238 350 135 328 68 311Z" fill="url(#wave-metal)" stroke="#b8e9ff" stroke-width="1"/>
+                <path d="M80 290C129 277 119 215 147 163C172 117 224 88 268 97C224 102 193 138 188 180C179 255 265 309 358 294C277 331 154 319 80 301Z" fill="url(#wave-blue)"/>
+                <path d="M244 111C278 105 316 126 312 158C309 180 291 199 272 203C283 188 282 169 271 158C246 133 218 162 218 191C207 166 219 127 244 111Z" fill="url(#wave-core)"/>
+                <path d="M130 156C164 77 245 55 307 91C348 115 349 165 319 198C303 216 274 222 253 210C288 202 306 178 303 151C298 113 260 90 224 99C188 108 167 133 150 166L148 144L135 165Z" fill="url(#wave-foam)"/>
+                <path d="M150 162C178 102 239 75 283 95C313 108 329 129 326 153" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M132 181C122 212 122 240 112 263M145 184C133 226 143 263 173 279M167 167C151 222 176 274 224 293" stroke="#bef0ff" stroke-opacity=".5" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M69 291C142 313 245 329 373 285L361 317C248 350 132 330 68 311Z" fill="url(#wave-edge)"/>
+                <path d="M75 292C154 316 274 323 366 289" stroke="#f1fbff" stroke-width="2" stroke-linecap="round"/>
+                <path d="M181 112L187 105M204 99L211 96M281 100L291 105M316 122L320 129" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="143" cy="134" r="4" fill="#eefaff"/><circle cx="162" cy="103" r="3" fill="#b9e9ff"/><circle cx="290" cy="74" r="3.5" fill="#f3fcff"/>
+                <path d="M335 222v16m-8-8h16" stroke="#ebfaff" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="102" cy="203" r="3" fill="#98ddff"/>
+              </svg>
+            </div>
+            <span class="ocean-particle particle-one"></span><span class="ocean-particle particle-two"></span><span class="ocean-particle particle-three"></span>
+          </div>
+          <span class="illustration-label">OGNI USCITA, UNA STORIA.</span>
+        </div>
       </div>
-
+      <div class="quick-actions" aria-label="Azioni rapide"><button data-action="new-catch"><span>🐟</span> Registra una cattura <span>↗</span></button><button data-section-link="spot"><span>📍</span> Trova i tuoi spot <span>↗</span></button><button data-section-link="guide"><span>📖</span> Impara una tecnica <span>↗</span></button></div>
+      <div class="onboarding" id="onboarding"><div><span class="eyebrow">DA DOVE INIZIARE</span><h2>Tre passi, e sei pronto.</h2><p>I dati si salvano automaticamente in questo browser. Scarica un backup per portarli su un altro dispositivo.</p></div><div class="onboarding-steps"><button data-action="new-gear" id="step-gear">01 · Aggiungi una canna</button><button data-section-link="spot" id="step-spot">02 · Salva il tuo spot</button><button data-action="new-trip" id="step-trip">03 · Racconta l’uscita</button></div></div>
       <!-- Banner installa app -->
       <div id="install-banner" class="install-banner hidden">
         <span>📲 Installa l'app sul tuo telefono!</span>
@@ -329,12 +310,14 @@
               <p class="card-sub">Cerca la tua città</p>
             </div>
           </div>
+          <label class="sr-only" for="meteo-city">Città per il meteo</label>
           <div class="meteo-search-row">
-            <input type="text" id="meteo-city" placeholder="Es: Roma, Milano..." />
+            <input type="text" id="meteo-city" placeholder="Es: Roma, Milano..."  maxlength="160" />
             <button id="btn-meteo" class="btn-primary">Cerca</button>
           </div>
           <div id="meteo-loading" class="info-msg hidden">⏳ Ricerca...</div>
           <div id="meteo-error" class="error-msg hidden">❌ Città non trovata.</div>
+          <p class="service-note">Previsioni <a href="https://api.met.no/doc/License" target="_blank" rel="noopener">MET Norway · CC BY 4.0</a>, valori arrotondati. Ricerca OpenStreetMap. Richiede internet.</p>
           <div id="meteo-result" class="meteo-result hidden">
             <div class="meteo-main">
               <span class="meteo-temp" id="meteo-temp">--</span>
@@ -384,7 +367,7 @@
           <div class="card-head">
             <span class="card-emoji">🔄</span>
             <div>
-              <h3>Salvataggio Automatico</h3>
+              <h3>Backup su file</h3>
               <p class="card-sub" id="autosave-status-label">Disattivato</p>
             </div>
             <label class="toggle-switch" title="Attiva salvataggio automatico">
@@ -397,6 +380,7 @@
           </p>
         </div>
 
+        <div class="card card-checklist card-full"><div class="card-head"><span class="card-emoji">✓</span><div><h3>La prossima uscita inizia qui</h3><p class="card-sub">Una checklist per non lasciare nulla a casa.</p></div><span id="checklist-count" class="pill">0/0</span></div><div class="checklist-controls"><label for="checklist-technique">Come vuoi pescare?</label><select id="checklist-technique"><option value="generale">Uscita generica</option><option value="spinning">Spinning</option><option value="surfcasting">Surfcasting</option><option value="carpfishing">Carpfishing</option></select><button class="text-action" id="checklist-reset">Ricomincia</button></div><div id="checklist-items" class="checklist-items"></div></div>
         <!-- ULTIMA USCITA -->
         <div class="card card-ultima card-full">
           <div class="card-head">
@@ -411,6 +395,7 @@
         </div>
       </div>
 
+      <div class="home-editorial"><div><p class="eyebrow">DALLA PREPARAZIONE AL RICORDO</p><h2>Un posto per tutta la tua passione.</h2><p>Fishing Inventory è un quaderno digitale per organizzare ciò che usi e ricordare ciò che impari. Nel catalogo puoi annotare nome, grammatura, quantità e tecnica di ogni canna, mulinello o accessorio: prima di una sessione basta una ricerca per ritrovare il materiale giusto.</p><p>Gli spot collegano un luogo alle tue osservazioni. Salva coordinate, tipo di ambiente e una foto; nel diario abbina lo spot all’attrezzatura utilizzata. Tornando sulla stessa zona potrai rileggere le note sulle condizioni e confrontare le uscite, senza affidarti alla memoria.</p><a href="/help.html">Scopri come usare l’app →</a></div><div><p class="eyebrow">CONTINUA A IMPARARE</p><h2>Ogni tecnica ha la sua guida.</h2><p>Muovere i primi passi nello spinning o preparare una sessione di surfcasting richiede scelte diverse. Le guide spiegano gli elementi di base di attrezzatura, montature ed esche. Usale come punto di partenza e annota nel diario cosa funziona per te.</p><div class="editorial-links"><a href="/guide-surfcasting.html">Surfcasting <span>↗</span></a><a href="/guide-spinning-mare.html">Spinning in mare <span>↗</span></a><a href="/guide-carpfishing.html">Carpfishing <span>↗</span></a></div><p class="service-note">Prima di pescare verifica regolamenti locali, licenze, divieti e condizioni di sicurezza. La mappa non certifica che un luogo sia accessibile o autorizzato.</p></div></div>
       <!-- AdSense fondo Home — push() viene chiamato da JS dopo splash -->
       <div class="ad-section-banner">
         <ins id="ad-home" class="adsbygoogle" style="display:block"
@@ -439,20 +424,14 @@
               <h2 class="page-title">🎣 Attrezzatura</h2>
               <button class="btn-primary" id="btn-add-att">➕ Aggiungi</button>
             </div>
-            <div id="att-list" class="grid-list">
+            <div class="list-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="search-attrezzatura" type="search" placeholder="Cerca in attrezzatura…" aria-label="Cerca in attrezzatura" autocomplete="off"></label><label class="sr-only" for="sort-attrezzatura">Ordina attrezzatura</label><select id="sort-attrezzatura"><option value="recenti">Più recenti</option><option value="nome">Nome A–Z</option><option value="meno-recenti">Meno recenti</option></select><label class="favourite-filter"><input type="checkbox" id="favourites-attrezzatura"> Solo preferiti</label><button class="text-action" data-export-csv="attrezzatura">↓ CSV</button></div><p class="search-summary" id="summary-attrezzatura" aria-live="polite"></p><div id="att-list" class="grid-list">
               <div class="empty-state" id="att-empty">
                 <div class="empty-icon">🎣</div>
                 <p>Nessuna attrezzatura.<br>Aggiungine una!</p>
               </div>
             </div>
             <!-- AdSense fondo Attrezzatura — push() da JS -->
-            <div class="ad-section-banner">
-              <ins id="ad-attrezzatura" class="adsbygoogle" style="display:block"
-                data-ad-client="ca-pub-9299744740820480"
-                data-ad-slot="1789596216"
-                data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            </div>
+
           </div>
         </div>
       </div>
@@ -466,8 +445,8 @@
           <button class="btn-primary" id="btn-save-spot">📌 Salva Spot</button>
         </div>
         <div id="geo-error" class="error-msg hidden">❌ Geolocalizzazione non disponibile.</div>
-        <div id="map" class="map-container"></div>
-        <h3 class="sub-title">Spot Salvati</h3>
+        <p class="section-description">Seleziona un punto sulla mappa oppure inserisci le coordinate. I tuoi spot restano in questo browser.</p><div class="map-actions"><button id="btn-locate" class="btn-secondary">◎ Usa la mia posizione</button><button id="btn-manual-spot" class="btn-secondary">+ Spot da coordinate</button></div><div id="map" class="map-container" aria-label="Mappa degli spot"></div>
+        <div class="list-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="search-spot" type="search" placeholder="Cerca in spot…" aria-label="Cerca in spot" autocomplete="off"></label><label class="sr-only" for="sort-spot">Ordina spot</label><select id="sort-spot"><option value="recenti">Più recenti</option><option value="nome">Nome A–Z</option><option value="meno-recenti">Meno recenti</option></select><label class="favourite-filter"><input type="checkbox" id="favourites-spot"> Solo preferiti</label><button class="text-action" data-export-csv="spot">↓ CSV</button></div><p class="search-summary" id="summary-spot" aria-live="polite"></p><h3 class="sub-title">Spot Salvati</h3>
         <div id="spot-list" class="grid-list">
           <div class="empty-state" id="spot-empty">
             <div class="empty-icon">📍</div>
@@ -475,13 +454,7 @@
           </div>
         </div>
         <!-- AdSense fondo Spot — push() da JS -->
-        <div class="ad-section-banner">
-          <ins id="ad-spot" class="adsbygoogle" style="display:block"
-            data-ad-client="ca-pub-9299744740820480"
-            data-ad-slot="1789596216"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        </div>
+
       </div>
     </section>
 
@@ -492,20 +465,14 @@
           <h2 class="page-title">📔 Diario Uscite</h2>
           <button class="btn-primary" id="btn-add-uscita">➕ Nuova Uscita</button>
         </div>
-        <div id="diario-list" class="diario-list">
+        <div class="list-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="search-diario" type="search" placeholder="Cerca in diario…" aria-label="Cerca in diario" autocomplete="off"></label><label class="sr-only" for="sort-diario">Ordina diario</label><select id="sort-diario"><option value="recenti">Più recenti</option><option value="nome">Nome A–Z</option><option value="meno-recenti">Meno recenti</option></select><button class="text-action" data-export-csv="diario">↓ CSV</button></div><p class="search-summary" id="summary-diario" aria-live="polite"></p><div id="diario-list" class="diario-list">
           <div class="empty-state" id="diario-empty">
             <div class="empty-icon">📔</div>
             <p>Nessuna uscita registrata.<br>Aggiungi la tua prima avventura!</p>
           </div>
         </div>
         <!-- AdSense fondo Diario — push() da JS -->
-        <div class="ad-section-banner">
-          <ins id="ad-diario" class="adsbygoogle" style="display:block"
-            data-ad-client="ca-pub-9299744740820480"
-            data-ad-slot="1789596216"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        </div>
+
       </div>
     </section>
 
@@ -528,7 +495,7 @@
               </div>
             </div>
             <div class="chart-wrap">
-              <canvas id="chart-uscite"></canvas>
+              <canvas id="chart-uscite" role="img" aria-label="Grafico uscite mensili"></canvas><p id="chart-text" class="sr-only"></p>
               <div id="chart-empty" class="chart-empty hidden">
                 <span>📊</span>
                 <p>Nessuna uscita nell'anno selezionato</p>
@@ -536,6 +503,7 @@
             </div>
           </div>
 
+          <div class="card card-full capture-insights"><div class="card-head"><span class="card-emoji">🐟</span><h3>Le catture dell’anno selezionato</h3></div><div id="capture-insights"></div></div>
           <div class="stats-mini-grid">
             <div class="card mini-stat">
               <span class="mini-stat-icon">📔</span>
@@ -585,13 +553,7 @@
         </div>
 
         <!-- AdSense fondo Statistiche — push() da JS -->
-        <div class="ad-section-banner">
-          <ins id="ad-statistiche" class="adsbygoogle" style="display:block"
-            data-ad-client="ca-pub-9299744740820480"
-            data-ad-slot="1789596216"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        </div>
+
       </div>
     </section>
 
@@ -602,20 +564,14 @@
           <h2 class="page-title">🐟 Le mie Catture</h2>
           <button class="btn-primary" id="btn-add-cattura">➕ Aggiungi Cattura</button>
         </div>
-        <div id="catture-list" class="catture-grid">
+        <div class="list-controls"><label class="search-box"><span aria-hidden="true">⌕</span><input id="search-catture" type="search" placeholder="Cerca in catture…" aria-label="Cerca in catture" autocomplete="off"></label><label class="sr-only" for="sort-catture">Ordina catture</label><select id="sort-catture"><option value="recenti">Più recenti</option><option value="nome">Nome A–Z</option><option value="meno-recenti">Meno recenti</option></select><button class="text-action" data-export-csv="catture">↓ CSV</button></div><p class="search-summary" id="summary-catture" aria-live="polite"></p><div id="catture-list" class="catture-grid">
           <div class="empty-state" id="catture-empty">
             <div class="empty-icon">🐟</div>
             <p>Nessuna cattura registrata.<br>Aggiungi la tua prima!</p>
           </div>
         </div>
         <!-- AdSense fondo Catture — push() da JS -->
-        <div class="ad-section-banner">
-          <ins id="ad-catture" class="adsbygoogle" style="display:block"
-            data-ad-client="ca-pub-9299744740820480"
-            data-ad-slot="1789596216"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        </div>
+
       </div>
     </section>
 
@@ -697,11 +653,11 @@
     <div class="modal">
       <div class="modal-header">
         <h3>➕ Nuova Attrezzatura</h3>
-        <button class="modal-close" id="modal-att-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-att-close">✕</button>
       </div>
-      <form id="form-att" class="modal-form" novalidate>
+      <form id="form-att" class="modal-form">
         <div class="form-group">
-          <label>Tipo *</label>
+          <label for="att-tipo">Tipo *</label>
           <select id="att-tipo" required>
             <option value="">-- Seleziona tipo --</option>
             <option value="canna">🎣 Canna</option>
@@ -710,7 +666,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Ambiente di Pesca</label>
+          <label for="att-ambiente">Ambiente di Pesca</label>
           <select id="att-ambiente">
             <option value="">-- Seleziona ambiente --</option>
             <option value="mare">🌊 Mare</option>
@@ -719,29 +675,29 @@
           </select>
         </div>
         <div class="form-group" id="att-tecnica-group" style="display:none">
-          <label>Tecnica di Pesca</label>
+          <label for="att-tecnica">Tecnica di Pesca</label>
           <select id="att-tecnica">
             <option value="">-- Seleziona tecnica --</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="att-nome" placeholder="Es: Shimano Stradic FL 4000" required />
+          <label for="att-nome">Nome *</label>
+          <input type="text" id="att-nome" placeholder="Es: Shimano Stradic FL 4000" required  maxlength="160" />
         </div>
         <div class="form-group">
-          <label>Tipologia / Grammatura</label>
-          <input type="text" id="att-tipologia" placeholder="Es: Spinning, 20g, Match..." />
+          <label for="att-tipologia">Tipologia / Grammatura</label>
+          <input type="text" id="att-tipologia" placeholder="Es: Spinning, 20g, Match..."  maxlength="160" />
         </div>
         <div class="form-group">
-          <label>Quantità</label>
-          <input type="number" id="att-quantita" min="1" value="1" placeholder="1" />
+          <label for="att-quantita">Quantità</label>
+          <input type="number" id="att-quantita" min="1" max="9999" step="1" value="1" placeholder="1" />
         </div>
         <div class="form-group">
-          <label>Note</label>
-          <textarea id="att-note" placeholder="Note aggiuntive..." rows="2"></textarea>
+          <label for="att-note">Note</label>
+          <textarea id="att-note" placeholder="Note aggiuntive..." rows="2" maxlength="4000"></textarea>
         </div>
         <div class="form-error hidden" id="form-att-error">Compila i campi obbligatori.</div>
-        <button type="submit" class="btn-primary btn-full">💾 Salva</button>
+        <button type="submit" class="btn-primary btn-full">Salva attrezzatura</button>
       </form>
     </div>
   </div>
@@ -751,15 +707,15 @@
     <div class="modal">
       <div class="modal-header">
         <h3>📌 Salva Spot</h3>
-        <button class="modal-close" id="modal-spot-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-spot-close">✕</button>
       </div>
-      <form id="form-spot" class="modal-form" novalidate>
+      <form id="form-spot" class="modal-form">
         <div class="form-group">
-          <label>Nome Spot *</label>
-          <input type="text" id="spot-nome" placeholder="Es: Lago di Como - Nord" required />
+          <label for="spot-nome">Nome Spot *</label>
+          <input type="text" id="spot-nome" placeholder="Es: Lago di Como - Nord" required  maxlength="160" />
         </div>
         <div class="form-group">
-          <label>Categoria</label>
+          <label for="spot-categoria">Categoria</label>
           <select id="spot-categoria">
             <option value="">-- Seleziona categoria --</option>
             <option value="spiaggia">🏖️ Spiaggia</option>
@@ -776,8 +732,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Note</label>
-          <textarea id="spot-note" placeholder="Tipo pesca, specie, orari..." rows="2"></textarea>
+          <label for="spot-note">Note</label>
+          <textarea id="spot-note" placeholder="Tipo pesca, specie, orari..." rows="2" maxlength="4000"></textarea>
         </div>
         <div class="form-group">
           <label>📷 Foto Spot</label>
@@ -790,7 +746,7 @@
             <button type="button" class="foto-remove-btn" id="spot-foto-remove">✕ Rimuovi</button>
           </div>
         </div>
-        <div class="spot-coords-preview" id="spot-coords-preview"></div>
+        <div class="form-row"><div class="form-group"><label for="spot-lat">Latitudine *</label><input id="spot-lat" type="number" min="-90" max="90" step="any" placeholder="41.9" required></div><div class="form-group"><label for="spot-lng">Longitudine *</label><input id="spot-lng" type="number" min="-180" max="180" step="any" placeholder="12.5" required></div></div><div class="spot-coords-preview" id="spot-coords-preview"></div>
         <div class="form-error hidden" id="form-spot-error">Inserisci il nome dello spot.</div>
         <button type="submit" class="btn-primary btn-full">📌 Salva Spot</button>
       </form>
@@ -802,21 +758,21 @@
     <div class="modal modal-wide">
       <div class="modal-header">
         <h3>📔 Nuova Uscita</h3>
-        <button class="modal-close" id="modal-uscita-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-uscita-close">✕</button>
       </div>
-      <form id="form-uscita" class="modal-form" novalidate>
+      <form id="form-uscita" class="modal-form">
         <div class="form-row">
           <div class="form-group">
-            <label>Data *</label>
+            <label for="uscita-data">Data *</label>
             <input type="date" id="uscita-data" required />
           </div>
           <div class="form-group">
-            <label>Orario</label>
+            <label for="uscita-ora">Orario</label>
             <input type="time" id="uscita-ora" />
           </div>
         </div>
         <div class="form-group">
-          <label>Spot utilizzato</label>
+          <label for="uscita-spot">Spot utilizzato</label>
           <select id="uscita-spot">
             <option value="">-- Nessuno / Non salvato --</option>
           </select>
@@ -826,9 +782,9 @@
           <div id="uscita-att-checks" class="checks-grid"></div>
         </div>
         <div class="form-group">
-          <label>Note / Commenti</label>
+          <label for="uscita-note">Note / Commenti</label>
           <textarea id="uscita-note" placeholder="Come è andata? Catture, condizioni meteo, osservazioni..."
-            rows="3"></textarea>
+            rows="3" maxlength="4000"></textarea>
         </div>
         <div class="form-error hidden" id="form-uscita-error">Inserisci almeno la data.</div>
         <button type="submit" class="btn-primary btn-full">💾 Salva Uscita</button>
@@ -844,14 +800,14 @@
     <div class="modal">
       <div class="modal-header">
         <h3>📂 Importa Backup</h3>
-        <button class="modal-close" id="modal-import-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-import-close">✕</button>
       </div>
       <div class="modal-form">
         <div class="import-info">
           <div class="import-preview" id="import-preview"></div>
+          <div class="form-group"><label for="import-mode">Come importare?</label><select id="import-mode"><option value="merge">Unisci ai miei dati (consigliato)</option><option value="replace">Sostituisci tutti i dati</option></select></div>
           <div class="import-warning">
-            ⚠️ <strong>Attenzione:</strong> l'importazione sovrascriverà tutti i dati attuali (attrezzatura, spot e
-            diario). Questa operazione non è reversibile.
+            Unisci conserva gli elementi già presenti; in caso di stesso ID prevale il file importato. Sostituisci salva prima una copia di recupero sul dispositivo.
           </div>
         </div>
         <div class="form-error hidden" id="import-error">File non valido o corrotto.</div>
@@ -868,26 +824,26 @@
     <div class="modal">
       <div class="modal-header">
         <h3>🐟 Nuova Cattura</h3>
-        <button class="modal-close" id="modal-cattura-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-cattura-close">✕</button>
       </div>
-      <form id="form-cattura" class="modal-form" novalidate>
+      <form id="form-cattura" class="modal-form">
         <div class="form-row">
           <div class="form-group">
-            <label>Data *</label>
+            <label for="cattura-data">Data *</label>
             <input type="date" id="cattura-data" required />
           </div>
           <div class="form-group">
-            <label>Peso (kg)</label>
+            <label for="cattura-peso">Peso (kg)</label>
             <input type="number" id="cattura-peso" min="0" step="0.01" placeholder="Es: 1.25" />
           </div>
         </div>
         <div class="form-group">
-          <label>Tipo di Pesce *</label>
-          <input type="text" id="cattura-specie" placeholder="Es: Spigola, Carpa, Trota..." required />
+          <label for="cattura-specie">Tipo di Pesce *</label>
+          <input type="text" id="cattura-specie" placeholder="Es: Spigola, Carpa, Trota..." required  maxlength="160" />
         </div>
         <div class="form-group">
-          <label>Note</label>
-          <textarea id="cattura-note" placeholder="Esca usata, spot, condizioni..." rows="2"></textarea>
+          <label for="cattura-note">Note</label>
+          <textarea id="cattura-note" placeholder="Esca usata, spot, condizioni..." rows="2" maxlength="4000"></textarea>
         </div>
         <div class="form-group">
           <label>📷 Foto Cattura</label>
@@ -900,6 +856,7 @@
             <button type="button" class="foto-remove-btn" id="cattura-foto-remove">✕ Rimuovi</button>
           </div>
         </div>
+        <div class="form-row"><div class="form-group"><label for="cattura-spot">Spot</label><select id="cattura-spot"><option value="">Nessuno</option></select></div><div class="form-group"><label for="cattura-lunghezza">Lunghezza (cm)</label><input id="cattura-lunghezza" type="number" min="0" step="0.1"></div></div><label class="release-label"><input id="cattura-rilasciata" type="checkbox"> Cattura rilasciata</label>
         <div class="form-error hidden" id="form-cattura-error">Compila i campi obbligatori.</div>
         <button type="submit" class="btn-primary btn-full">💾 Salva Cattura</button>
       </form>
@@ -918,19 +875,13 @@
 
   <!-- FOOTER LINKS — visibili a Google e utenti -->
   <div class="firma-fixed">
-    <span>Autore Claudio Sanna</span>
+    <span>Fishing Inventory · Claudio Sanna</span>
+    <a href="/help.html" class="firma-link">Guida all’app</a>
+    <a href="/contact.html" class="firma-link">Contatti</a>
+    <button type="button" class="firma-link" data-privacy-preferences>Preferenze privacy</button>
     <a href="/about.html" class="firma-link">ℹ️ Chi Siamo</a>
     <a href="/guide.html" class="firma-link">📖 Guide</a>
     <a href="/privacy.html" class="firma-link">🔒 Privacy</a>
-  </div>
-
-  <!-- AdSense Anchor sticky mobile — push() da JS dopo splash -->
-  <div class="ad-anchor-mobile">
-    <ins id="ad-anchor" class="adsbygoogle" style="display:block"
-      data-ad-client="ca-pub-9299744740820480"
-      data-ad-slot="1789596216"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
   </div>
 
   <!-- MODALE INFO SALVA -->
@@ -938,7 +889,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>💾 Come funziona il Salvataggio</h3>
-        <button class="modal-close" id="modal-salva-info-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-salva-info-close">✕</button>
       </div>
       <div class="modal-form">
         <div class="info-block">
@@ -977,6 +928,7 @@
             </div>
           </div>
         </div>
+        <button type="button" class="btn-secondary" id="btn-recover-import">Ripristina prima dell’ultima importazione</button>
         <button class="btn-primary btn-full" id="btn-salva-confirm">💾 Salva ora</button>
       </div>
     </div>
@@ -987,7 +939,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>📂 Come funziona il Caricamento</h3>
-        <button class="modal-close" id="modal-carica-info-close">✕</button>
+        <button type="button" aria-label="Chiudi finestra" class="modal-close" id="modal-carica-info-close">✕</button>
       </div>
       <div class="modal-form">
         <div class="info-block">
@@ -1011,9 +963,8 @@
           <div class="info-section info-tip">
             <span class="info-icon">⚠️</span>
             <div>
-              <strong>Attenzione</strong>
-              <p>Il caricamento <strong>sostituisce tutti i dati attuali</strong> (attrezzatura, spot, diario, catture).
-                Fai prima un backup se hai dati da conservare.</p>
+              <strong>Importazione protetta</strong>
+              <p>Puoi <strong>unire</strong> il file ai tuoi dati oppure sostituirli. Prima della conferma l’app conserva una copia di recupero locale. Un backup esterno resta consigliato.</p>
             </div>
           </div>
           <div class="info-section">
@@ -1030,7 +981,15 @@
     </div>
   </div>
 
+  <nav class="bottom-nav" aria-label="Navigazione rapida"><button data-section-link="home">⌂<span>Home</span></button><button data-section-link="attrezzatura">🎣<span>Inventario</span></button><button data-section-link="diario">▤<span>Diario</span></button><button data-section-link="catture">🐟<span>Catture</span></button><button data-open-assistant>✦<span>Aiuto</span></button></nav>
+  <button class="assistant-launcher" data-open-assistant aria-label="Apri Bussola, assistente dell’app">✦ <span>Bussola</span></button>
+  <div id="assistant-panel" class="assistant-panel hidden" role="dialog" aria-modal="true" aria-labelledby="assistant-title"><header><div><span class="eyebrow">IL TUO AIUTO A BORDO</span><h2 id="assistant-title">Bussola <span>✦</span></h2></div><button class="text-action" id="assistant-close" aria-label="Chiudi Bussola">✕</button></header><p class="assistant-disclosure">Assistente locale con risposte guidate, gratuito e offline. Non usa un’AI generativa e non invia le tue domande a servizi esterni.</p><div id="assistant-messages" role="log" aria-live="polite"></div><div class="assistant-suggestions"><button data-question="Come comincio?">Da dove inizio?</button><button data-question="Come salvo un backup?">I miei dati sono al sicuro?</button><button data-question="Prepara un’uscita spinning">Prepara un’uscita</button></div><form id="assistant-form"><label class="sr-only" for="assistant-input">Domanda per Bussola</label><input id="assistant-input" placeholder="Chiedimi come usare l’app…" maxlength="300" required autocomplete="off"><button class="btn-primary" type="submit" aria-label="Invia domanda">↑</button></form></div>
+  <div id="undo-bar" class="undo-bar hidden" role="status"><span id="undo-message"></span><button id="undo-button">Annulla eliminazione</button><button id="undo-dismiss" aria-label="Chiudi notifica">✕</button></div>
+  <script src="data.js"></script>
   <script src="script.js"></script>
+  <script src="weather.js"></script>
+  <script src="upgrade.js"></script>
+  <script src="ocean.js"></script>
 
 </body>
 

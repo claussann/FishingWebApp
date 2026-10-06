@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fishing-inventory.it/sitemap.xml

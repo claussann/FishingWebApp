@@ -4,7 +4,7 @@
    Palette identica a style.css — struttura blog per Google AdSense
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+/* System fonts: no extra font requests, also available offline. */
 
 /* ── VARIABILI — specchio esatto di style.css ── */
 :root {
@@ -503,3 +503,19 @@ p.article-lead {
 .page-footer .footer-links { display: flex; flex-wrap: wrap; gap: 12px; }
 .page-footer a { font-size: .75rem; color: var(--c-white30); text-decoration: none; transition: color .15s; }
 .page-footer a:hover { color: var(--c-teal); }
+
+/* Shared editorial appearance */
+:root { --c-bg:#0c1d25; --c-bg2:#132831; --c-teal:#74d1b5; --c-white60:#a9bdc2; --c-white30:#8ba3aa; --font-body:'Segoe UI',system-ui,sans-serif; --font-display:'Segoe UI',system-ui,sans-serif; }
+body { line-height:1.7; }
+.article-title { letter-spacing:-1px; font-weight:650; }
+a:focus-visible, button:focus-visible { outline:3px solid #74d1b5; outline-offset:3px; }
+.footer-links button { min-height:36px; }
+
+/* Ocean chrome shared with the application, kept light on editorial pages. */
+:root { --c-bg:#061629; --c-bg2:#0c223a; --c-teal:#9bdcff; --c-blue:#68b8ff; --c-white:#f6fbff; --c-white80:#dbe9f6; --c-white60:#adc3db; --c-white30:#8fa9c6; --card-border:#b0dbff25; --card-bg:#102941; }
+body { background:radial-gradient(ellipse at 90% 0%,#12679b35,transparent 48%),var(--c-bg); }
+.site-header { background:#061629e8; border-bottom:1px solid var(--card-border); backdrop-filter:blur(16px); }
+.btn-back-app { color:#0b3454; background:linear-gradient(118deg,#eaf9ff,#a9d7f4 24%,#fff 43%,#b9ddf3 64%,#edf9ff); border-color:#e3f5ffb3; box-shadow:inset 0 1px 0 #fff; }
+.article-card, .guide-card { background:linear-gradient(140deg,#15344e,#0d233b); border-color:var(--card-border); box-shadow:0 16px 40px #0003,inset 0 1px 0 #ffffff18; }
+.article-title { color:var(--c-white); }
+a:focus-visible, button:focus-visible { outline-color:var(--c-teal); }

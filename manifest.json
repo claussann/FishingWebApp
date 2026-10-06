@@ -6,9 +6,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0f1923",
-  "theme_color": "#00C9A7",
-  "orientation": "portrait-primary",
+  "background_color": "#061629",
+  "theme_color": "#061629",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -37,17 +36,32 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshot-mobile.png",
-      "sizes": "780x1688",
-      "type": "image/png",
-      "label": "Fishing Inventory — Home"
+      "src": "/screenshot-desktop-v4.jpg",
+      "sizes": "1435x897",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Home di Fishing Inventory su desktop"
     },
     {
-      "src": "/screenshot-desktop.png",
-      "sizes": "2560x1600",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Fishing Inventory — Desktop"
+      "src": "/screenshot-mobile-v4.jpg",
+      "sizes": "385x833",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Home di Fishing Inventory su smartphone"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Attrezzatura",
+      "url": "/#attrezzatura"
+    },
+    {
+      "name": "Diario uscite",
+      "url": "/#diario"
+    },
+    {
+      "name": "Catture",
+      "url": "/#catture"
     }
   ]
 }

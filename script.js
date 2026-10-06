@@ -1,9 +1,9 @@
 /**
  * ============================================================
- * FISHING INVENTORY v2 — script.js
+ * FISHING INVENTORY v4 — script.js
  * Funzionalità:
- *   - Splash screen (5s)
- *   - Home con meteo (Open-Meteo + Nominatim)
+ *   - Avvio immediato
+ *   - Home con meteo (MET Norway + Nominatim)
  *   - Attrezzatura (CRUD + filtri)
  *   - Spot di Pesca (Leaflet + OpenStreetMap + geoloc)
  *   - Diario Uscite (data, ora, spot, attrezzatura, note)
@@ -104,10 +104,12 @@ let currentSection = 'home'; // traccia sezione attiva
    UTILITY
    ============================================================ */
 function lsGet(key) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : []; }
+  try { const v = localStorage.getItem(key); const parsed = v ? JSON.parse(v) : []; return Array.isArray(parsed) ? parsed : []; }
   catch (e) { return []; }
 }
-function lsSet(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+function lsSet(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch (error) { showToast('Spazio esaurito o salvataggio bloccato. Esporta un backup prima di proseguire.', 'error'); throw error; } }
+function preferenceGet(key, fallback = '') { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } }
+function preferenceSet(key, value) { try { localStorage.setItem(key, value); } catch { /* Cosmetic preferences must not prevent opening the app. */ } }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function escHtml(s) {
   if (!s) return '';
@@ -126,63 +128,8 @@ function fmtYear(iso) { return new Date(iso).getFullYear(); }
    Inizializza un blocco <ins> solo quando è visibile (width > 0).
    Usa data-adsbygoogle-status per evitare doppi push().
    ============================================================ */
-function initAd(insId) {
-  const el = document.getElementById(insId);
-  if (!el) return;
-  // Se AdSense ha già processato questo slot (anche con errore) non riprovare
-  if (el.getAttribute('data-adsbygoogle-status')) return;
-  // Controllo aggiuntivo: il contenitore deve avere larghezza > 0
-  if (el.offsetWidth === 0) return;
-  try {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  } catch (e) {
-    console.warn('AdSense initAd error:', insId, e);
-  }
-}
-
-/* ============================================================
-   SPLASH SCREEN (5 secondi)
-   ============================================================ */
-function initSplash() {
-  const splash = document.getElementById('splash-screen');
-  const app = document.getElementById('app');
-
-  function launchApp() {
-    splash.style.transition = 'opacity 0.7s ease';
-    splash.style.opacity = '0';
-    setTimeout(() => {
-      splash.style.display = 'none';
-      app.classList.remove('hidden');
-      try {
-        initApp();
-      } catch (err) {
-        console.error('Errore initApp:', err);
-        app.classList.remove('hidden');
-      }
-
-      // ── ADSENSE: inizializza Home e Anchor DOPO che #app è visibile ──
-      // Il delay garantisce che il browser abbia calcolato le larghezze
-      setTimeout(() => {
-        initAd('ad-home');
-        initAd('ad-anchor');
-      }, 500);
-
-    }, 700);
-  }
-
-  setTimeout(launchApp, 5000);
-
-  // Failsafe: forza chiusura splash dopo 8s
-  setTimeout(() => {
-    if (splash.style.display !== 'none') {
-      console.warn('Failsafe splash: forzata chiusura');
-      splash.style.display = 'none';
-      app.classList.remove('hidden');
-      try { initApp(); } catch (e) { console.error(e); }
-      setTimeout(() => { initAd('ad-home'); initAd('ad-anchor'); }, 500);
-    }
-  }, 8000);
-}
+function initAd() { window.FIAds?.refresh(); }
+function initSplash() { initApp(); }
 
 /* ============================================================
    INIT APP
@@ -193,6 +140,7 @@ function initApp() {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
         console.log('SW registrato:', reg.scope);
+        monitorServiceWorker(reg);
       })
       .catch(err => console.warn('SW non registrato:', err));
 
@@ -204,7 +152,7 @@ function initApp() {
   }
 
   // Carica Google Fonts in modo non bloccante
-  loadExternalCSS('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+
 
   initTheme();
   initNavbar();
@@ -218,13 +166,14 @@ function initApp() {
   initPWA();
   updateStats();
   renderUltimaUscita();
+  initEnhancements();
 }
 
 /* ============================================================
    TEMA DARK / LIGHT
    ============================================================ */
 function initTheme() {
-  const saved = localStorage.getItem(LS_THEME) || 'dark';
+  const saved = preferenceGet(LS_THEME, 'dark');
   applyTheme(saved);
 
   document.getElementById('btn-theme').addEventListener('click', toggleTheme);
@@ -243,7 +192,7 @@ function toggleTheme() {
 function applyTheme(theme) {
   const isLight = theme === 'light';
   document.body.classList.toggle('light', isLight);
-  localStorage.setItem(LS_THEME, theme);
+  preferenceSet(LS_THEME, theme);
 
   const icon = isLight ? '☀️' : '🌙';
   const btnTheme = document.getElementById('btn-theme');
@@ -256,7 +205,9 @@ function applyTheme(theme) {
    NAVIGAZIONE TRA SEZIONI
    ============================================================ */
 function showSection(name) {
+  if (!document.getElementById('section-' + name)) return;
   currentSection = name;
+  location.hash = name;
   document.getElementById('mobile-nav').classList.add('hidden');
 
   document.querySelectorAll('.nav-btn[data-section]').forEach(b =>
@@ -268,8 +219,10 @@ function showSection(name) {
     s.classList.toggle('hidden', !isTarget);
   });
 
+  syncNavigation(name);
   if (name === 'attrezzatura') renderAttrezzatura();
   else if (name === 'spot') {
+    renderSpotList();
     setTimeout(() => {
       if (!map) initMap();
       else if (typeof map.invalidateSize === 'function') { map.invalidateSize(); renderSpotList(); }
@@ -278,7 +231,6 @@ function showSection(name) {
   else if (name === 'diario') renderDiario();
   else if (name === 'catture') renderCatture();
   else if (name === 'statistiche') {
-    statsYear = new Date().getFullYear();
     document.getElementById('stats-year').textContent = statsYear;
     renderStatistiche();
   }
@@ -344,42 +296,7 @@ function initMeteo() {
   if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') searchMeteo(); });
 }
 
-async function searchMeteo() {
-  const city = (document.getElementById('meteo-city').value || '').trim();
-  if (!city) return;
-  setMeteoState('loading');
-  try {
-    const geo = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`,
-      { headers: { 'Accept-Language': 'it' } }
-    ).then(r => r.json());
-
-    if (!geo.length) { setMeteoState('error'); return; }
-    const { lat, lon, display_name } = geo[0];
-    const cityName = display_name.split(',')[0];
-
-    const m = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weathercode&timezone=auto`
-    ).then(r => r.json());
-
-    if (!m.current) { setMeteoState('error'); return; }
-    const c = m.current;
-    const w = WMO[c.weathercode] || { e: '🌡️', d: 'N/D' };
-
-    document.getElementById('meteo-icon-display').textContent = w.e;
-    document.getElementById('meteo-temp').textContent = `${Math.round(c.temperature_2m)}°C`;
-    document.getElementById('meteo-city-name').textContent = cityName;
-    document.getElementById('meteo-desc').textContent = w.d;
-    document.getElementById('meteo-extra').innerHTML = `
-      <span class="meteo-chip">💨 ${c.wind_speed_10m} km/h</span>
-      <span class="meteo-chip">💧 ${c.relative_humidity_2m}%</span>
-    `;
-    setMeteoState('result');
-  } catch (err) {
-    console.error(err);
-    setMeteoState('error');
-  }
-}
+function searchMeteo() {} // Implementation in weather.js
 
 function setMeteoState(state) {
   ['loading', 'error', 'result'].forEach(s =>
@@ -472,6 +389,7 @@ function initAttrezzaturaEvents() {
 function closeModalAtt() {
   document.getElementById('modal-att').classList.add('hidden');
   document.getElementById('form-att').reset();
+  delete document.getElementById('form-att').dataset.editId;
   document.getElementById('form-att-error').classList.add('hidden');
   document.getElementById('att-tecnica-group').style.display = 'none';
 }
@@ -484,7 +402,7 @@ function saveAttrezzatura(e) {
   const note = document.getElementById('att-note').value.trim();
   const ambiente = document.getElementById('att-ambiente').value;
   const tecnica = document.getElementById('att-tecnica').value;
-  const quantita = parseInt(document.getElementById('att-quantita').value) || 1;
+  const quantita = parseInt(document.getElementById('att-quantita').value, 10) || 1;
 
   if (!tipo || !nome) {
     document.getElementById('form-att-error').classList.remove('hidden');
@@ -496,7 +414,7 @@ function saveAttrezzatura(e) {
     createdAt: new Date().toISOString()
   };
   const lista = lsGet(LS_ATT);
-  lista.push(item);
+  upsertItem(lista, item, 'form-att');
   lsSet(LS_ATT, lista);
 
   closeModalAtt();
@@ -506,7 +424,7 @@ function saveAttrezzatura(e) {
 }
 
 function renderAttrezzatura() {
-  const lista = lsGet(LS_ATT);
+  const lista = filteredRecords('attrezzatura', lsGet(LS_ATT));
   const filtered = currentFilter === 'tutti' ? lista : lista.filter(i => i.tipo === currentFilter);
   const container = document.getElementById('att-list');
   const emptyEl = document.getElementById('att-empty');
@@ -526,7 +444,7 @@ function renderAttrezzatura() {
     card.dataset.tipo = item.tipo;
 
     const ambienteHtml = item.ambiente
-      ? `<span class="att-ambiente-badge">${AMBIENTE_LABELS[item.ambiente] || item.ambiente}</span>`
+      ? `<span class="att-ambiente-badge">${AMBIENTE_LABELS[item.ambiente] || escHtml(item.ambiente)}</span>`
       : '';
     const qtaHtml = (item.quantita && item.quantita > 1)
       ? `<span class="att-qty-badge">✕${item.quantita}</span>`
@@ -537,7 +455,7 @@ function renderAttrezzatura() {
 
     card.innerHTML = `
       <div class="att-item-header">
-        <span class="att-tipo-badge badge-${item.tipo}">${labels[item.tipo] || item.tipo}</span>
+        <span class="att-tipo-badge badge-${escHtml(item.tipo)}">${labels[item.tipo] || escHtml(item.tipo)}</span>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           ${ambienteHtml}
           ${qtaHtml}
@@ -549,7 +467,7 @@ function renderAttrezzatura() {
       ${tecnicaHtml}
       ${item.note ? `<div class="att-note-text">${escHtml(item.note)}</div>` : ''}
       <div class="att-item-footer">
-        <button class="btn-delete" data-id="${item.id}">🗑️ Elimina</button>
+        <button class="btn-delete" data-id="${escHtml(item.id)}">🗑️ Elimina</button>
       </div>
     `;
     card.querySelector('.btn-delete').addEventListener('click', () => deleteAttrezzatura(item.id));
@@ -557,13 +475,7 @@ function renderAttrezzatura() {
   });
 }
 
-function deleteAttrezzatura(id) {
-  if (!confirm('Eliminare questa attrezzatura?')) return;
-  lsSet(LS_ATT, lsGet(LS_ATT).filter(i => i.id !== id));
-  renderAttrezzatura();
-  updateStats();
-  triggerAutosave();
-}
+function deleteAttrezzatura(id) { softDelete(LS_ATT, id, 'attrezzatura'); }
 
 /* ============================================================
    SPOT DI PESCA
@@ -587,6 +499,7 @@ function initSpotEvents() {
 function closeModalSpot() {
   document.getElementById('modal-spot').classList.add('hidden');
   document.getElementById('form-spot').reset();
+  delete document.getElementById('form-spot').dataset.editId;
   document.getElementById('form-spot-error').classList.add('hidden');
   // Reset foto
   window._spotFotoBase64 = null;
@@ -636,23 +549,6 @@ function buildMap() {
     maxZoom: 19
   }).addTo(map);
 
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        currentLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        map.setView([currentLatLng.lat, currentLatLng.lng], 13);
-        currentMarker = L.marker([currentLatLng.lat, currentLatLng.lng], {
-          icon: makeIcon('📍', '#00C9A7')
-        }).addTo(map).bindPopup('<b>📍 Sei qui!</b>').openPopup();
-        document.getElementById('geo-error').classList.add('hidden');
-      },
-      err => { document.getElementById('geo-error').classList.remove('hidden'); },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  } else {
-    document.getElementById('geo-error').classList.remove('hidden');
-  }
-
   map.on('click', e => {
     currentLatLng = { lat: e.latlng.lat, lng: e.latlng.lng };
     if (currentMarker) map.removeLayer(currentMarker);
@@ -674,12 +570,9 @@ function makeIcon(emoji, color) {
 }
 
 function openSpotModal() {
-  if (!currentLatLng) {
-    alert('Attiva la geolocalizzazione oppure clicca sulla mappa per selezionare una posizione.');
-    return;
-  }
-  document.getElementById('spot-coords-preview').textContent =
-    `📌 ${currentLatLng.lat.toFixed(6)}, ${currentLatLng.lng.toFixed(6)}`;
+  document.getElementById('spot-lat').value = currentLatLng?.lat ?? '';
+  document.getElementById('spot-lng').value = currentLatLng?.lng ?? '';
+  document.getElementById('spot-coords-preview').textContent = currentLatLng ? 'Posizione selezionata. Puoi correggere le coordinate.' : 'Inserisci le coordinate oppure scegli un punto sulla mappa.';
   document.getElementById('modal-spot').classList.remove('hidden');
 }
 
@@ -688,20 +581,23 @@ function saveSpot(e) {
   const nome = document.getElementById('spot-nome').value.trim();
   const note = document.getElementById('spot-note').value.trim();
   const categoria = document.getElementById('spot-categoria').value;
+  const lat = Number(document.getElementById('spot-lat').value);
+  const lng = Number(document.getElementById('spot-lng').value);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return;
   if (!nome) { document.getElementById('form-spot-error').classList.remove('hidden'); return; }
 
   const foto = window._spotFotoBase64 || null;
 
   const spot = {
     id: genId(), nome, note, categoria, foto,
-    lat: currentLatLng.lat, lng: currentLatLng.lng,
+    lat, lng,
     createdAt: new Date().toISOString()
   };
   const lista = lsGet(LS_SPOT);
-  lista.push(spot);
+  upsertItem(lista, spot, 'form-spot');
   lsSet(LS_SPOT, lista);
 
-  addSpotMarker(spot);
+  if (map) renderSpotMarkers();
   closeModalSpot();
   renderSpotList();
   updateStats();
@@ -727,7 +623,7 @@ function renderSpotMarkers() {
 }
 
 function renderSpotList() {
-  const lista = lsGet(LS_SPOT);
+  const lista = filteredRecords('spot', lsGet(LS_SPOT));
   const container = document.getElementById('spot-list');
   const emptyEl = document.getElementById('spot-empty');
   container.querySelectorAll('.spot-item').forEach(el => el.remove());
@@ -738,9 +634,9 @@ function renderSpotList() {
   lista.forEach(spot => {
     const card = document.createElement('div');
     card.className = 'spot-item';
-    const catLabel = spot.categoria ? SPOT_CAT_LABELS[spot.categoria] || spot.categoria : null;
+    const catLabel = spot.categoria ? SPOT_CAT_LABELS[spot.categoria] || escHtml(spot.categoria) : null;
     const fotoHtml = spot.foto
-      ? `<img class="spot-foto-card" src="${spot.foto}" alt="Foto spot" onclick="openFotoFullscreen('${spot.id}','spot')" />`
+      ? `<img class="spot-foto-card" src="${escHtml(FIData.photo(spot.foto) || '')}" alt="Foto spot" loading="lazy" />`
       : '';
     card.innerHTML = `
       ${fotoHtml}
@@ -752,8 +648,8 @@ function renderSpotList() {
       ${spot.note ? `<div class="spot-note-text">${escHtml(spot.note)}</div>` : ''}
       <span class="spot-date">📅 ${fmtDate(spot.createdAt)}</span>
       <div class="spot-actions">
-        <button class="btn-go-spot" data-id="${spot.id}">🗺️ Vedi mappa</button>
-        <button class="btn-delete" data-id="${spot.id}">🗑️ Elimina</button>
+        <button class="btn-go-spot" data-id="${escHtml(spot.id)}">🗺️ Vedi mappa</button>
+        <button class="btn-delete" data-id="${escHtml(spot.id)}">🗑️ Elimina</button>
       </div>
     `;
     card.querySelector('.btn-go-spot').addEventListener('click', () => {
@@ -764,20 +660,13 @@ function renderSpotList() {
         document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
       }
     });
+    if (spot.foto) card.querySelector('.spot-foto-card')?.addEventListener('click', () => openFotoFullscreen(spot.id, 'spot'));
     card.querySelector('.btn-delete').addEventListener('click', () => deleteSpot(spot.id));
     container.appendChild(card);
   });
 }
 
-function deleteSpot(id) {
-  if (!confirm('Eliminare questo spot?')) return;
-  lsSet(LS_SPOT, lsGet(LS_SPOT).filter(s => s.id !== id));
-  const found = spotMarkers.find(m => m.id === id);
-  if (found && map) { map.removeLayer(found.marker); spotMarkers = spotMarkers.filter(m => m.id !== id); }
-  renderSpotList();
-  updateStats();
-  triggerAutosave();
-}
+function deleteSpot(id) { softDelete(LS_SPOT, id, 'spot'); }
 
 /* ============================================================
    DIARIO USCITE
@@ -792,7 +681,7 @@ function initDiarioEvents() {
 }
 
 function openModalUscita() {
-  document.getElementById('uscita-data').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('uscita-data').value = localToday();
 
   const selSpot = document.getElementById('uscita-spot');
   selSpot.innerHTML = '<option value="">-- Nessuno / Non salvato --</option>';
@@ -814,8 +703,8 @@ function openModalUscita() {
       const div = document.createElement('div');
       div.className = 'check-item';
       div.innerHTML = `
-        <input type="checkbox" id="chk-${a.id}" value="${a.id}" />
-        <label for="chk-${a.id}">
+        <input type="checkbox" id="chk-${escHtml(a.id)}" value="${escHtml(a.id)}" />
+        <label for="chk-${escHtml(a.id)}">
           ${labels[a.tipo] || ''} ${escHtml(a.nome)}
           ${a.tipologia ? `<span class="check-label-badge"> · ${escHtml(a.tipologia)}</span>` : ''}
         </label>
@@ -830,6 +719,7 @@ function openModalUscita() {
 function closeModalUscita() {
   document.getElementById('modal-uscita').classList.add('hidden');
   document.getElementById('form-uscita').reset();
+  delete document.getElementById('form-uscita').dataset.editId;
   document.getElementById('form-uscita-error').classList.add('hidden');
 }
 
@@ -848,7 +738,7 @@ function saveUscita(e) {
 
   const uscita = { id: genId(), data, ora, spotId, attIds, note, createdAt: new Date().toISOString() };
   const lista = lsGet(LS_DIARIO);
-  lista.push(uscita);
+  upsertItem(lista, uscita, 'form-uscita');
   lsSet(LS_DIARIO, lista);
 
   closeModalUscita();
@@ -859,7 +749,7 @@ function saveUscita(e) {
 }
 
 function renderDiario() {
-  const lista = lsGet(LS_DIARIO);
+  const lista = filteredRecords('diario', lsGet(LS_DIARIO));
   const container = document.getElementById('diario-list');
   const emptyEl = document.getElementById('diario-empty');
   container.querySelectorAll('.uscita-card').forEach(el => el.remove());
@@ -867,7 +757,7 @@ function renderDiario() {
   if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
+  const sorted = lista;
   const spots = lsGet(LS_SPOT);
   const atts = lsGet(LS_ATT);
 
@@ -887,7 +777,7 @@ function renderDiario() {
         <div class="uscita-header-row">
           ${u.ora ? `<span class="uscita-ora">🕐 ${u.ora}</span>` : '<span></span>'}
           <div class="uscita-actions">
-            <button class="btn-delete" data-id="${u.id}">🗑️ Elimina</button>
+            <button class="btn-delete" data-id="${escHtml(u.id)}">🗑️ Elimina</button>
           </div>
         </div>
         <div class="uscita-tags">
@@ -902,14 +792,7 @@ function renderDiario() {
   });
 }
 
-function deleteUscita(id) {
-  if (!confirm('Eliminare questa uscita?')) return;
-  lsSet(LS_DIARIO, lsGet(LS_DIARIO).filter(u => u.id !== id));
-  renderDiario();
-  updateStats();
-  renderUltimaUscita();
-  triggerAutosave();
-}
+function deleteUscita(id) { softDelete(LS_DIARIO, id, 'diario'); }
 
 /* ============================================================
    STATISTICHE
@@ -1087,7 +970,7 @@ let _autosaveEnabled = false;
 const LS_AUTOSAVE = 'fi_autosave';
 
 function initBackup() {
-  _autosaveEnabled = localStorage.getItem(LS_AUTOSAVE) === 'true';
+  _autosaveEnabled = preferenceGet(LS_AUTOSAVE) === 'true';
   const toggle = document.getElementById('autosave-toggle');
   if (toggle) {
     toggle.checked = _autosaveEnabled;
@@ -1142,6 +1025,7 @@ function initBackup() {
   fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { showToast('File troppo grande: massimo 20 MB.', 'error'); return; }
     const reader = new FileReader();
     reader.onload = evt => {
       try {
@@ -1165,7 +1049,8 @@ function initBackup() {
 function buildBackup() {
   return {
     exportDate: new Date().toISOString(),
-    version: '3.0',
+    version: '4.0',
+    checklist: getChecklist(),
     attrezzatura: lsGet(LS_ATT),
     spot: lsGet(LS_SPOT),
     diario: lsGet(LS_DIARIO),
@@ -1178,6 +1063,7 @@ async function doSave(isAutosave = false) {
   const json = JSON.stringify(backup, null, 2);
   const filename = `fishing-inventory-backup-${new Date().toISOString().slice(0, 10)}.json`;
 
+  if (isAutosave && !_fsaFileHandle) return;
   if ('showSaveFilePicker' in window) {
     try {
       if (!_fsaFileHandle || !isAutosave) {
@@ -1198,6 +1084,7 @@ async function doSave(isAutosave = false) {
     } catch (err) {
       if (err.name === 'AbortError') return;
       _fsaFileHandle = null;
+      if (isAutosave) { showToast('Backup su file sospeso: scegli di nuovo il file con Backup.', 'error'); return; }
     }
   }
 
@@ -1221,12 +1108,15 @@ function triggerAutosave() {
 
 function onAutosaveToggle() {
   _autosaveEnabled = document.getElementById('autosave-toggle').checked;
-  localStorage.setItem(LS_AUTOSAVE, _autosaveEnabled);
+  preferenceSet(LS_AUTOSAVE, _autosaveEnabled);
   updateAutosaveLabel();
 
   if (_autosaveEnabled) {
     if (!('showSaveFilePicker' in window)) {
-      showToast('⚠️ Autosave: il tuo browser userà Download standard', 'error');
+      _autosaveEnabled = false;
+      document.getElementById('autosave-toggle').checked = false;
+      preferenceSet(LS_AUTOSAVE, 'false');
+      showToast('Usa Backup per scaricare una copia. I dati si salvano già nel browser.', 'error');
     } else {
       showToast('✅ Salvataggio automatico attivato!', 'success');
       if (!_fsaFileHandle) doSave(false);
@@ -1245,11 +1135,11 @@ function updateAutosaveLabel() {
   if (_autosaveEnabled) {
     label.textContent = '✅ Attivo';
     label.style.color = 'var(--c-teal)';
-    if (desc) desc.textContent = 'I dati vengono salvati automaticamente ad ogni modifica.';
+    if (desc) desc.textContent = 'I dati restano nel browser; il file scelto viene aggiornato mentre questa sessione è aperta.';
   } else {
     label.textContent = 'Disattivato';
     label.style.color = '';
-    if (desc) desc.textContent = 'Attiva per salvare automaticamente ad ogni modifica.';
+    if (desc) desc.textContent = 'I dati si salvano già nel browser. Attiva per aggiornare anche un file su Chrome/Edge desktop.';
   }
 }
 
@@ -1257,6 +1147,7 @@ function showImportPreview(data) {
   const errEl = document.getElementById('import-error');
   errEl.classList.add('hidden');
 
+  try { data = FIData.validateBackup(data); } catch (error) { showImportError(error.message); return; }
   if (typeof data !== 'object' || data === null) {
     showImportError('Struttura del file non riconosciuta.');
     return;
@@ -1266,11 +1157,6 @@ function showImportPreview(data) {
   const spot = Array.isArray(data.spot) ? data.spot : [];
   const diario = Array.isArray(data.diario) ? data.diario : [];
   const catture = Array.isArray(data.catture) ? data.catture : [];
-
-  if (!att.length && !spot.length && !diario.length && !catture.length) {
-    showImportError('Il file è vuoto o non contiene dati riconoscibili.');
-    return;
-  }
 
   let exportDateStr = '–';
   if (data.exportDate) {
@@ -1290,46 +1176,23 @@ function showImportPreview(data) {
     </div>
   `;
 
-  window._importData = { att, spot, diario, catture };
+  window._importData = { att, spot, diario, catture, checklist: data.checklist };
+  document.getElementById('btn-import-confirm').disabled = false;
   document.getElementById('btn-import-confirm').onclick = () => confirmImport();
   document.getElementById('modal-import').classList.remove('hidden');
   document.getElementById('mobile-nav').classList.add('hidden');
 }
 
 function showImportError(msg) {
+  window._importData = null;
+  document.getElementById('btn-import-confirm').disabled = true;
   document.getElementById('import-preview').innerHTML =
     `<span style="color:var(--c-coral)">❌ ${escHtml(msg)}</span>`;
   document.getElementById('import-error').classList.add('hidden');
   document.getElementById('modal-import').classList.remove('hidden');
 }
 
-function confirmImport() {
-  const { att, spot, diario, catture } = window._importData || {};
-  if (!att && !spot && !diario && !catture) return;
-
-  lsSet(LS_ATT, att || []);
-  lsSet(LS_SPOT, spot || []);
-  lsSet(LS_DIARIO, diario || []);
-  lsSet(LS_CATTURE, catture || []);
-
-  closeModalImport();
-  window._importData = null;
-
-  updateStats();
-  renderUltimaUscita();
-
-  showToast('✅ Backup importato con successo!', 'success');
-  triggerAutosave();
-
-  if (currentSection === 'attrezzatura') renderAttrezzatura();
-  else if (currentSection === 'diario') renderDiario();
-  else if (currentSection === 'catture') renderCatture();
-  else if (currentSection === 'statistiche') renderStatistiche();
-  else if (currentSection === 'spot') {
-    renderSpotList();
-    if (map) renderSpotMarkers();
-  }
-}
+function confirmImport() { applyImport(); }
 
 function closeModalImport() {
   document.getElementById('modal-import').classList.add('hidden');
@@ -1345,11 +1208,12 @@ function showToast(msg, type = 'success') {
   const toast = document.createElement('div');
   toast.className = 'fi-toast';
   toast.textContent = msg;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
   toast.style.cssText = `
     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
     z-index: 9999; padding: 12px 24px; border-radius: 30px;
     font-family: var(--font-body); font-size: 0.9rem; font-weight: 800;
-    white-space: nowrap; pointer-events: none;
+    white-space: normal; max-width: min(90vw, 600px); text-align: center; pointer-events: none;
     box-shadow: 0 8px 30px rgba(0,0,0,0.5);
     animation: toastIn 0.3s ease, toastOut 0.4s ease 2.6s forwards;
     ${type === 'success'
@@ -1393,6 +1257,7 @@ function initFotoInput(inputId, imgId, previewId, globalKey) {
   input.addEventListener('change', () => {
     const file = input.files[0];
     if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 12 * 1024 * 1024) { showToast('Scegli una foto JPG, PNG o WebP entro 12 MB.', 'error'); input.value = ''; return; }
     const reader = new FileReader();
     reader.onload = evt => {
       const img = new Image();
@@ -1411,8 +1276,10 @@ function initFotoInput(inputId, imgId, previewId, globalKey) {
         document.getElementById(imgId).src = b64;
         document.getElementById(previewId).classList.remove('hidden');
       };
+      img.onerror = () => showToast('Impossibile leggere questa foto.', 'error');
       img.src = evt.target.result;
     };
+    reader.onerror = () => showToast('Errore durante la lettura della foto.', 'error');
     reader.readAsDataURL(file);
   });
 }
@@ -1442,7 +1309,7 @@ function openFotoFullscreen(id, type) {
    ============================================================ */
 function initCattureEvents() {
   document.getElementById('btn-add-cattura').addEventListener('click', () => {
-    document.getElementById('cattura-data').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('cattura-data').value = localToday();
     document.getElementById('modal-cattura').classList.remove('hidden');
   });
   document.getElementById('modal-cattura-close').addEventListener('click', closeModalCattura);
@@ -1460,6 +1327,7 @@ function initCattureEvents() {
 function closeModalCattura() {
   document.getElementById('modal-cattura').classList.add('hidden');
   document.getElementById('form-cattura').reset();
+  delete document.getElementById('form-cattura').dataset.editId;
   document.getElementById('form-cattura-error').classList.add('hidden');
   resetFoto('cattura-foto-input', 'cattura-foto-img', 'cattura-foto-preview', '_catFotoBase64');
 }
@@ -1477,9 +1345,9 @@ function saveCattura(e) {
     return;
   }
 
-  const cattura = { id: genId(), data, specie, peso, note, foto, createdAt: new Date().toISOString() };
+  const cattura = { id: genId(), data, specie, peso, note, foto, spotId: document.getElementById('cattura-spot').value, lunghezza: document.getElementById('cattura-lunghezza').value, rilasciata: document.getElementById('cattura-rilasciata').checked, createdAt: new Date().toISOString() };
   const lista = lsGet(LS_CATTURE);
-  lista.push(cattura);
+  upsertItem(lista, cattura, 'form-cattura');
   lsSet(LS_CATTURE, lista);
 
   closeModalCattura();
@@ -1489,7 +1357,7 @@ function saveCattura(e) {
 }
 
 function renderCatture() {
-  const lista = lsGet(LS_CATTURE);
+  const lista = filteredRecords('catture', lsGet(LS_CATTURE));
   const container = document.getElementById('catture-list');
   const emptyEl = document.getElementById('catture-empty');
   container.querySelectorAll('.cattura-card, .ad-banner-catture').forEach(el => el.remove());
@@ -1497,7 +1365,7 @@ function renderCatture() {
   if (!lista.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  const sorted = [...lista].sort((a, b) => new Date(b.data) - new Date(a.data));
+  const sorted = lista;
 
   sorted.forEach((c, i) => {
     if (i > 0 && i % 6 === 0) {
@@ -1510,7 +1378,7 @@ function renderCatture() {
     card.className = 'cattura-card';
 
     const fotoHtml = c.foto
-      ? `<img class="cattura-foto" src="${c.foto}" alt="Foto cattura" />`
+      ? `<img class="cattura-foto" src="${escHtml(FIData.photo(c.foto) || '')}" alt="Foto cattura" loading="lazy" />`
       : `<div class="cattura-no-foto">🐟</div>`;
 
     const pesoHtml = c.peso
@@ -1528,7 +1396,7 @@ function renderCatture() {
         ${c.note ? `<div class="cattura-note-text">${escHtml(c.note)}</div>` : ''}
       </div>
       <div class="cattura-footer">
-        <button class="btn-delete" data-id="${c.id}">🗑️ Elimina</button>
+        <button class="btn-delete" data-id="${escHtml(c.id)}">🗑️ Elimina</button>
       </div>
     `;
 
@@ -1540,13 +1408,7 @@ function renderCatture() {
   });
 }
 
-function deleteCattura(id) {
-  if (!confirm('Eliminare questa cattura?')) return;
-  lsSet(LS_CATTURE, lsGet(LS_CATTURE).filter(c => c.id !== id));
-  renderCatture();
-  updateStats();
-  triggerAutosave();
-}
+function deleteCattura(id) { softDelete(LS_CATTURE, id, 'catture'); }
 
 /* ============================================================
    PWA — Install prompt
@@ -1590,11 +1452,7 @@ function initPWA() {
     deferredPrompt = e;
     showInstallUI();
 
-    const autoPrompt = () => {
-      if (deferredPrompt) doInstall();
-    };
-    document.addEventListener('click', autoPrompt, { once: true });
-    document.addEventListener('touchstart', autoPrompt, { once: true });
+
   });
 
   if (btnDesktop) btnDesktop.addEventListener('click', doInstall);
